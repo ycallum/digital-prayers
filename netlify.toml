@@ -1,0 +1,58 @@
+# Netlify Configuration for Digital Prayer Beads
+
+[build]
+  # Build command
+  command = "npm run build:prod"
+
+  # Publish directory
+  publish = "dist"
+
+  # Environment variables (optional)
+  [build.environment]
+    NODE_VERSION = "18"
+
+# SPA routing - redirect all requests to index.html
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Headers for security and PWA support
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+# Service Worker headers
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+    Service-Worker-Allowed = "/"
+
+# Asset caching
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Audio files caching
+[[headers]]
+  for = "/sounds/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Icons caching
+[[headers]]
+  for = "/icons/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Manifest caching
+[[headers]]
+  for = "/manifest.webmanifest"
+  [headers.values]
+    Cache-Control = "public, max-age=86400, must-revalidate"

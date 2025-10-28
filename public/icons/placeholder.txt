@@ -1,0 +1,6 @@
+PWA icon files will be added here:
+- icon-192.png (192x192px)
+- icon-512.png (512x512px)
+
+These should feature a meditation/prayer bead theme.
+For now, the app will work without custom icons.

@@ -1,0 +1,19 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&family=Noto+Sans+SC:wght@300;400;700&display=swap');
+@import "tailwindcss";
+
+@layer base {
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    overscroll-behavior: none;
+    touch-action: pan-y;
+  }
+}
+
+@layer utilities {
+  .touch-none {
+    touch-action: none;
+  }
+}
