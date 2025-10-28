@@ -30,6 +30,7 @@ dist-ssr
 
 # Build info
 *.tsbuildinfo
+.vite
 
 # Lock files (using npm)
 bun.lock

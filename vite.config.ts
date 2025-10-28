@@ -7,7 +7,12 @@ import { VitePWA } from 'vite-plugin-pwa';
 export default defineConfig({
   server: {
     port: 5175,
+    fs: {
+      // Allow serving files outside of root for better ad-blocker compatibility
+      strict: false,
+    },
   },
+  cacheDir: '.vite', // Move cache out of node_modules
   plugins: [
     react(),
     tailwindcss(),
