@@ -28,6 +28,8 @@ const initialState: AppState = {
   customBeadCount: 108,
   showSettings: false,
   isCompleting: false,
+  visualizationMode: 'ring',
+  theme: 'default',
 };
 
 /**
@@ -136,6 +138,18 @@ function appReducer(state: AppState, action: AppAction): AppState {
       return {
         ...state,
         showSettings: !state.showSettings,
+      };
+
+    case 'SET_VISUALIZATION_MODE':
+      return {
+        ...state,
+        visualizationMode: action.payload,
+      };
+
+    case 'SET_THEME':
+      return {
+        ...state,
+        theme: action.payload,
       };
 
     case 'LOAD_STATE':

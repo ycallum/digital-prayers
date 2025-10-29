@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect } from 'react';
 import { ProgressRing } from './ProgressRing';
+import { BeadArc } from './BeadArc';
 import { CountDisplay } from './CountDisplay';
 import { CompletionEffect } from './CompletionEffect';
 import { useApp } from '../context/AppContext';
@@ -102,12 +103,20 @@ export function CountingArea() {
         tabIndex={0}
         aria-label={`Tap to increment count. Current count: ${state.currentCount} of ${state.totalBeads}`}
       >
-        <ProgressRing
-          current={state.currentCount}
-          total={state.totalBeads}
-          size={320}
-          isCompleting={state.isCompleting}
-        />
+        {state.visualizationMode === 'ring' ? (
+          <ProgressRing
+            current={state.currentCount}
+            total={state.totalBeads}
+            size={320}
+            isCompleting={state.isCompleting}
+          />
+        ) : (
+          <BeadArc
+            current={state.currentCount}
+            total={state.totalBeads}
+            isCompleting={state.isCompleting}
+          />
+        )}
         <CountDisplay
           current={state.currentCount}
           total={state.totalBeads}

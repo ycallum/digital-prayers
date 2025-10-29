@@ -1,5 +1,7 @@
 import { useRef, useMemo } from 'react';
 import { motion, useScroll, useTransform, MotionValue } from 'framer-motion';
+import { useApp } from '../context/AppContext';
+import { getThemeColors } from '../lib/theme';
 
 interface Word {
   text: string;
@@ -50,7 +52,7 @@ function AnimatedWord({ word, scrollY }: AnimatedWordProps) {
         opacity: word.opacity,
         y,
       }}
-      className="font-serif text-zen-300 select-none"
+      className="font-serif select-none"
     >
       {word.text}
     </motion.div>
@@ -58,6 +60,8 @@ function AnimatedWord({ word, scrollY }: AnimatedWordProps) {
 }
 
 export function BackgroundWords() {
+  const { state } = useApp();
+  const themeColors = getThemeColors(state.theme);
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollY } = useScroll();
 
@@ -71,7 +75,7 @@ export function BackgroundWords() {
   return (
     <div
       ref={containerRef}
-      className="fixed inset-0 pointer-events-none overflow-hidden"
+      className={`fixed inset-0 pointer-events-none overflow-hidden ${themeColors.text.secondary} transition-colors duration-500`}
       style={{ zIndex: 0 }}
     >
       {wordElements}

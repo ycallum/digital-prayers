@@ -6,9 +6,11 @@ import { SettingsDrawer } from './components/SettingsDrawer';
 import { BackgroundWords } from './components/BackgroundWords';
 import { AppProvider, useApp } from './context/AppContext';
 import { audioManager } from './lib/audio';
+import { getThemeColors } from './lib/theme';
 
 function AppContent() {
   const { state } = useApp();
+  const themeColors = getThemeColors(state.theme);
 
   useEffect(() => {
     audioManager.init();
@@ -16,7 +18,7 @@ function AppContent() {
 
   return (
     <div
-      className={`min-h-screen bg-parchment flex flex-col transition-all duration-300 relative ${
+      className={`min-h-screen ${themeColors.background} flex flex-col transition-all duration-500 relative ${
         state.brightnessMode === 'dimmed' ? 'brightness-75' : ''
       }`}
     >

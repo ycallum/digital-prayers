@@ -1,4 +1,6 @@
 import { motion } from 'framer-motion';
+import { useApp } from '../context/AppContext';
+import { getThemeColors } from '../lib/theme';
 
 interface ProgressRingProps {
   current: number;
@@ -8,6 +10,8 @@ interface ProgressRingProps {
 }
 
 export function ProgressRing({ current, total, size = 320, isCompleting = false }: ProgressRingProps) {
+  const { state } = useApp();
+  const themeColors = getThemeColors(state.theme);
   const strokeWidth = 8;
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
@@ -33,7 +37,7 @@ export function ProgressRing({ current, total, size = 320, isCompleting = false 
           fill="none"
           stroke="currentColor"
           strokeWidth={strokeWidth}
-          className="text-wood-light opacity-30"
+          className={`${themeColors.accent.secondary} opacity-30 transition-colors duration-500`}
         />
 
         <motion.circle
@@ -46,7 +50,7 @@ export function ProgressRing({ current, total, size = 320, isCompleting = false 
           strokeDasharray={circumference}
           strokeDashoffset={strokeDashoffset}
           strokeLinecap="round"
-          className={isCompleting ? 'text-gold' : 'text-jade-300'}
+          className={`${isCompleting ? themeColors.progressGlow : themeColors.progress} transition-colors duration-500`}
           initial={false}
           animate={{
             strokeDashoffset,
@@ -73,7 +77,7 @@ export function ProgressRing({ current, total, size = 320, isCompleting = false 
               cy={y}
               r={isActive ? 4 : 3}
               fill="currentColor"
-              className={isActive ? 'text-gold' : 'text-wood'}
+              className={`${isActive ? themeColors.progressGlow : themeColors.accent.secondary} transition-colors duration-500`}
               initial={false}
               animate={
                 isActive
