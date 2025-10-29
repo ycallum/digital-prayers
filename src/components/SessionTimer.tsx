@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Timer, RotateCcw } from 'lucide-react';
 import { useApp } from '../context/AppContext';
-import { getThemeColors } from '../lib/theme';
+import { getThemeClasses } from '../lib/theme';
 
 export function SessionTimer() {
   const { state, dispatch } = useApp();
-  const themeColors = getThemeColors(state.theme);
+  const theme = getThemeClasses();
   const [elapsed, setElapsed] = useState(0);
 
   useEffect(() => {
@@ -39,7 +39,7 @@ export function SessionTimer() {
   return (
     <div className="flex flex-col items-center gap-4 mt-8">
       {state.isSessionActive && (
-        <div className={`flex items-center justify-center gap-2 text-sm ${themeColors.text.secondary} transition-colors duration-500`}>
+        <div className={`flex items-center justify-center gap-2 text-sm ${theme.text.secondary} ${theme.transition}`}>
           <Timer className="w-4 h-4" />
           <span>
             {String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
@@ -49,7 +49,7 @@ export function SessionTimer() {
 
       <button
         onClick={handleReset}
-        className={`px-4 py-2 rounded-lg ${themeColors.button.hover} transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2 ${themeColors.text.tertiary} text-sm`}
+        className={`px-4 py-2 rounded-lg ${theme.button.hover} ${theme.transition} disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2 ${theme.text.tertiary} text-sm`}
         aria-label="Reset count and timer"
         disabled={state.currentCount === 0 && !state.isSessionActive}
       >

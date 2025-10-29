@@ -127,7 +127,7 @@ export function CountingArea() {
 
       {showInstruction && state.currentCount === 0 && (
         <div className="absolute -bottom-16 left-0 right-0 text-center">
-          <p className="text-xs text-zen-400">轻触屏幕开始计数</p>
+          <p className="text-xs opacity-40" style={{ color: 'var(--color-text-secondary)' }}>轻触屏幕开始计数</p>
         </div>
       )}
     </div>

@@ -1,6 +1,5 @@
 import { motion } from 'framer-motion';
-import { useApp } from '../context/AppContext';
-import { getThemeColors } from '../lib/theme';
+import { getThemeClasses } from '../lib/theme';
 
 interface BeadArcProps {
   current: number;
@@ -15,8 +14,7 @@ interface BeadPosition {
 }
 
 export function BeadArc({ current, total, isCompleting = false }: BeadArcProps) {
-  const { state } = useApp();
-  const themeColors = getThemeColors(state.theme);
+  const theme = getThemeClasses();
 
   const displayBeadCount = Math.min(total, 33);
   const beadsToShow = displayBeadCount;
@@ -71,8 +69,8 @@ export function BeadArc({ current, total, isCompleting = false }: BeadArcProps) 
           <motion.div
             key={i}
             className={`absolute rounded-full ${beadSize} ${
-              pos.isActive ? themeColors.bead.active : themeColors.bead.inactive
-            } shadow-lg`}
+              pos.isActive ? theme.bead.active : theme.bead.inactive
+            } shadow-lg ${theme.transition}`}
             style={{
               left: `${pos.x}%`,
               top: `${pos.y}%`,
@@ -123,7 +121,7 @@ export function BeadArc({ current, total, isCompleting = false }: BeadArcProps) 
 
       {total > displayBeadCount && (
         <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-xs opacity-50 pointer-events-auto">
-          <span className={themeColors.text.secondary}>
+          <span className={`${theme.text.secondary} ${theme.transition}`}>
             Showing {displayBeadCount} of {total} beads
           </span>
         </div>

@@ -1,6 +1,5 @@
 import { motion } from 'framer-motion';
-import { useApp } from '../context/AppContext';
-import { getThemeColors } from '../lib/theme';
+import { getThemeClasses } from '../lib/theme';
 
 interface ProgressRingProps {
   current: number;
@@ -10,8 +9,7 @@ interface ProgressRingProps {
 }
 
 export function ProgressRing({ current, total, size = 320, isCompleting = false }: ProgressRingProps) {
-  const { state } = useApp();
-  const themeColors = getThemeColors(state.theme);
+  const theme = getThemeClasses();
   const strokeWidth = 8;
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
@@ -37,7 +35,7 @@ export function ProgressRing({ current, total, size = 320, isCompleting = false 
           fill="none"
           stroke="currentColor"
           strokeWidth={strokeWidth}
-          className={`${themeColors.accent.secondary} opacity-30 transition-colors duration-500`}
+          className={`${theme.accent.secondary} opacity-30 ${theme.transition}`}
         />
 
         <motion.circle
@@ -50,7 +48,7 @@ export function ProgressRing({ current, total, size = 320, isCompleting = false 
           strokeDasharray={circumference}
           strokeDashoffset={strokeDashoffset}
           strokeLinecap="round"
-          className={`${isCompleting ? themeColors.progressGlow : themeColors.progress} transition-colors duration-500`}
+          className={`${isCompleting ? theme.progressGlow : theme.progress} ${theme.transition}`}
           initial={false}
           animate={{
             strokeDashoffset,
@@ -77,7 +75,7 @@ export function ProgressRing({ current, total, size = 320, isCompleting = false 
               cy={y}
               r={isActive ? 4 : 3}
               fill="currentColor"
-              className={`${isActive ? themeColors.progressGlow : themeColors.accent.secondary} transition-colors duration-500`}
+              className={`${isActive ? theme.progressGlow : theme.accent.secondary} ${theme.transition}`}
               initial={false}
               animate={
                 isActive
