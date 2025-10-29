@@ -30,16 +30,30 @@ export function BeadArc({ current, isCompleting = false }: BeadArcProps) {
     const positions: BeadPosition[] = [];
     const startAngle = Math.PI * 0.75;
     const endAngle = Math.PI * 2.25;
-    const angleRange = endAngle - startAngle;
 
-    for (let i = 0; i < FIXED_BEAD_COUNT; i++) {
-      const normalizedPosition = i / (FIXED_BEAD_COUNT - 1);
-      const angle = startAngle + (normalizedPosition * angleRange);
+    const centerX = 50;
+    const centerY = 50;
+    const radiusX = 42;
+    const radiusY = 42;
 
-      const centerX = 50;
-      const centerY = 50;
-      const radiusX = 42;
-      const radiusY = 42;
+    const leftStackSize = 7;
+    const rightStackSize = 7;
+    const leftStackSpacing = 0.08;
+    const rightStackSpacing = 0.08;
+
+    for (let i = 0; i < leftStackSize; i++) {
+      const normalizedPosition = i * leftStackSpacing;
+      const angle = startAngle + normalizedPosition;
+
+      const x = centerX + radiusX * Math.cos(angle);
+      const y = centerY + radiusY * Math.sin(angle);
+
+      positions.push({ x, y, angle });
+    }
+
+    for (let i = 0; i < rightStackSize; i++) {
+      const normalizedPosition = i * rightStackSpacing;
+      const angle = endAngle - normalizedPosition;
 
       const x = centerX + radiusX * Math.cos(angle);
       const y = centerY + radiusY * Math.sin(angle);
@@ -56,7 +70,7 @@ export function BeadArc({ current, isCompleting = false }: BeadArcProps) {
     const initialBeads: AnimatedBead[] = Array.from({ length: FIXED_BEAD_COUNT }, (_, i) => ({
       id: `bead-${i}`,
       position: i,
-      isActive: i === 0,
+      isActive: i === 6,
     }));
     setBeads(initialBeads);
   }, []);
@@ -74,21 +88,56 @@ export function BeadArc({ current, isCompleting = false }: BeadArcProps) {
 
       setTimeout(() => {
         setBeads(prevBeads => {
-          const newBeads = prevBeads.map(bead => ({
-            ...bead,
-            position: bead.position + 1,
-            isActive: bead.isActive,
-          }));
+          const activeBead = prevBeads.find(b => b.isActive);
+          if (!activeBead) return prevBeads;
+
+          const newBeads = prevBeads.map(bead => {
+            if (bead.isActive) {
+              return {
+                ...bead,
+                position: 7,
+                isActive: true,
+              };
+            }
+            return bead;
+          });
 
           return newBeads;
         });
 
         setTimeout(() => {
           setBeads(prevBeads => {
-            const rebalancedBeads = prevBeads.map((bead, idx) => ({
-              ...bead,
-              position: idx,
-            }));
+            const leftBeads = prevBeads.filter(b => b.position < 7 && !b.isActive);
+            const activeBead = prevBeads.find(b => b.isActive);
+            const rightBeads = prevBeads.filter(b => b.position >= 7 && !b.isActive);
+
+            const rebalancedBeads: AnimatedBead[] = [];
+
+            leftBeads.slice(1).forEach((bead, idx) => {
+              rebalancedBeads.push({
+                ...bead,
+                position: idx,
+                isActive: false,
+              });
+            });
+
+            if (activeBead) {
+              rightBeads.push(activeBead);
+            }
+
+            rightBeads.forEach((bead, idx) => {
+              rebalancedBeads.push({
+                ...bead,
+                position: 7 + idx,
+                isActive: false,
+              });
+            });
+
+            const newActiveIndex = rebalancedBeads.length > 7 ? 6 : Math.max(0, rebalancedBeads.findIndex(b => b.position < 7));
+            if (newActiveIndex >= 0 && rebalancedBeads[newActiveIndex]) {
+              rebalancedBeads[newActiveIndex].isActive = true;
+            }
+
             return rebalancedBeads;
           });
 
