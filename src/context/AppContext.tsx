@@ -2,13 +2,19 @@ import { createContext, useContext, useReducer, useEffect, type ReactNode } from
 import type { AppState, AppAction, PresetType } from '../types';
 import { storage, debounce } from '../lib/storage';
 
+/**
+ * Preset bead counts for different mala configurations
+ */
 const PRESET_COUNTS: Record<PresetType, number> = {
   full: 108,
   half: 54,
   short: 27,
   custom: 108,
-};
+} as const;
 
+/**
+ * Default application state
+ */
 const initialState: AppState = {
   currentCount: 0,
   totalBeads: 108,
@@ -24,6 +30,9 @@ const initialState: AppState = {
   isCompleting: false,
 };
 
+/**
+ * Main reducer for application state management
+ */
 function appReducer(state: AppState, action: AppAction): AppState {
   switch (action.type) {
     case 'INCREMENT_COUNT': {
@@ -140,18 +149,32 @@ function appReducer(state: AppState, action: AppAction): AppState {
   }
 }
 
-const AppContext = createContext<{
+/**
+ * Context type definition
+ */
+interface AppContextType {
   state: AppState;
   dispatch: React.Dispatch<AppAction>;
-} | null>(null);
+}
 
+const AppContext = createContext<AppContextType | null>(null);
+
+/**
+ * Debounced state persistence to localStorage
+ * Prevents excessive writes during rapid state changes
+ */
 const debouncedSave = debounce<[AppState]>((state: AppState) => {
   storage.save(state);
 }, 500);
 
+/**
+ * Provider component that wraps the application with state management
+ * Handles state persistence and restoration from localStorage
+ */
 export function AppProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(appReducer, initialState);
 
+  // Load saved state on mount
   useEffect(() => {
     const savedState = storage.load();
     if (savedState) {
@@ -159,6 +182,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  // Persist state changes to localStorage (debounced)
   useEffect(() => {
     debouncedSave(state);
   }, [state]);
@@ -170,8 +194,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
   );
 }
 
+/**
+ * Custom hook to access application state and dispatch
+ * @throws {Error} If used outside of AppProvider
+ * @returns {AppContextType} The application state and dispatch function
+ */
 // eslint-disable-next-line react-refresh/only-export-components
-export function useApp() {
+export function useApp(): AppContextType {
   const context = useContext(AppContext);
   if (!context) {
     throw new Error('useApp must be used within AppProvider');
