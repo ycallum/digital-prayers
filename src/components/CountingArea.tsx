@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useCallback, memo } from 'react';
 import { ProgressRing } from './ProgressRing';
 import { BeadArc } from './BeadArc';
 import { CountDisplay } from './CountDisplay';
@@ -7,7 +7,7 @@ import { useApp } from '../context/AppContext';
 import { haptics } from '../lib/haptics';
 import { audioManager } from '../lib/audio';
 
-export function CountingArea() {
+export const CountingArea = memo(function CountingArea() {
   const { state, dispatch } = useApp();
   const touchStartX = useRef(0);
   const touchStartY = useRef(0);
@@ -35,7 +35,7 @@ export function CountingArea() {
     }
   }, [state.isCompleting, state.audioEnabled, state.audioVolume, dispatch]);
 
-  const handleIncrement = () => {
+  const handleIncrement = useCallback(() => {
     if (state.isCompleting) return;
 
     dispatch({ type: 'INCREMENT_COUNT' });
@@ -44,16 +44,16 @@ export function CountingArea() {
       audioManager.play('click', state.audioVolume / 100);
     }
     haptics.light();
-  };
+  }, [state.isCompleting, state.audioEnabled, state.currentCount, state.totalBeads, state.audioVolume, dispatch]);
 
-  const handleDecrement = () => {
+  const handleDecrement = useCallback(() => {
     if (state.isCompleting || state.currentCount === 0) return;
 
     dispatch({ type: 'DECREMENT_COUNT' });
     haptics.light();
-  };
+  }, [state.isCompleting, state.currentCount, dispatch]);
 
-  const handleTouchStart = (e: React.TouchEvent) => {
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
     const touch = e.touches[0];
     touchStartX.current = touch.clientX;
     touchStartY.current = touch.clientY;
@@ -61,16 +61,16 @@ export function CountingArea() {
     longPressTimer.current = window.setTimeout(() => {
       haptics.medium();
     }, 800);
-  };
+  }, []);
 
-  const handleTouchMove = () => {
+  const handleTouchMove = useCallback(() => {
     if (longPressTimer.current) {
       clearTimeout(longPressTimer.current);
       longPressTimer.current = null;
     }
-  };
+  }, []);
 
-  const handleTouchEnd = (e: React.TouchEvent) => {
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
     if (longPressTimer.current) {
       clearTimeout(longPressTimer.current);
       longPressTimer.current = null;
@@ -89,7 +89,7 @@ export function CountingArea() {
     } else if (Math.abs(deltaX) < 10 && Math.abs(deltaY) < 10) {
       handleIncrement();
     }
-  };
+  }, [handleIncrement, handleDecrement]);
 
   return (
     <div className="relative w-full">
@@ -110,6 +110,10 @@ export function CountingArea() {
         role="button"
         tabIndex={0}
         aria-label={`Tap to increment count. Current count: ${state.currentCount} of ${state.totalBeads}`}
+        style={{
+          WebkitTapHighlightColor: 'transparent',
+          touchAction: 'none'
+        }}
       >
         {state.visualizationMode === 'ring' && (
           <div className="absolute inset-0 flex items-center justify-center">
@@ -137,4 +141,4 @@ export function CountingArea() {
       )}
     </div>
   );
-}
+});

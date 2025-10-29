@@ -1,10 +1,26 @@
+import { memo, useCallback } from 'react';
 import { Volume2, VolumeX, Sun, Moon, Settings } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { getThemeClasses } from '../lib/theme';
 
-export function Header() {
+export const Header = memo(function Header() {
   const { state, dispatch } = useApp();
   const theme = getThemeClasses();
+
+  const handleToggleAudio = useCallback(() => {
+    dispatch({ type: 'TOGGLE_AUDIO' });
+  }, [dispatch]);
+
+  const handleToggleBrightness = useCallback(() => {
+    dispatch({
+      type: 'SET_BRIGHTNESS',
+      payload: state.brightnessMode === 'normal' ? 'dimmed' : 'normal',
+    });
+  }, [dispatch, state.brightnessMode]);
+
+  const handleToggleSettings = useCallback(() => {
+    dispatch({ type: 'TOGGLE_SETTINGS' });
+  }, [dispatch]);
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 flex justify-center pt-6 px-4 pointer-events-none">
@@ -15,7 +31,7 @@ export function Header() {
 
         <div className={`flex items-center gap-1 ${theme.backgroundDark} bg-opacity-40 rounded-full px-1 py-1 ${theme.transition}`}>
           <button
-            onClick={() => dispatch({ type: 'TOGGLE_AUDIO' })}
+            onClick={handleToggleAudio}
             className={`p-2 rounded-full ${theme.button.hover} transition-all duration-200`}
             aria-label={state.audioEnabled ? 'Mute audio' : 'Unmute audio'}
           >
@@ -27,12 +43,7 @@ export function Header() {
           </button>
 
           <button
-            onClick={() =>
-              dispatch({
-                type: 'SET_BRIGHTNESS',
-                payload: state.brightnessMode === 'normal' ? 'dimmed' : 'normal',
-              })
-            }
+            onClick={handleToggleBrightness}
             className={`p-2 rounded-full ${theme.button.hover} transition-all duration-200`}
             aria-label={`Switch to ${state.brightnessMode === 'normal' ? 'dimmed' : 'normal'} mode`}
           >
@@ -44,7 +55,7 @@ export function Header() {
           </button>
 
           <button
-            onClick={() => dispatch({ type: 'TOGGLE_SETTINGS' })}
+            onClick={handleToggleSettings}
             className={`p-2 rounded-full ${theme.button.hover} transition-all duration-200`}
             aria-label="Open settings"
           >
@@ -54,4 +65,4 @@ export function Header() {
       </div>
     </header>
   );
-}
+});

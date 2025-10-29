@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { motion } from 'framer-motion';
 import { getThemeClasses } from '../lib/theme';
 
@@ -7,7 +8,7 @@ interface CountDisplayProps {
   round: number;
 }
 
-export function CountDisplay({ current, total, round }: CountDisplayProps) {
+export const CountDisplay = memo(function CountDisplay({ current, total, round }: CountDisplayProps) {
   const theme = getThemeClasses();
 
   return (
@@ -28,4 +29,4 @@ export function CountDisplay({ current, total, round }: CountDisplayProps) {
       <div className={`text-xs ${theme.text.secondary} mt-6 opacity-60 ${theme.transition}`}>Round {round}</div>
     </div>
   );
-}
+});
