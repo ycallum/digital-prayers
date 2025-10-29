@@ -68,7 +68,7 @@ export function BeadArc({ current, isCompleting = false }: BeadArcProps) {
       positions.push({ x, y, angle });
     }
 
-    for (let i = 0; i < rightStackSize; i++) {
+    for (let i = rightStackSize - 1; i >= 0; i--) {
       const normalizedPosition = i * rightStackSpacing;
       const angle = endAngle - normalizedPosition;
 
@@ -346,8 +346,8 @@ export function BeadArc({ current, isCompleting = false }: BeadArcProps) {
       <svg className="absolute inset-0 w-full h-full">
         <path
           d={pathData}
-          stroke="rgba(139, 111, 71, 0.25)"
-          strokeWidth="2"
+          stroke="rgba(139, 111, 71, 0.6)"
+          strokeWidth="3"
           fill="none"
           strokeLinecap="round"
         />
