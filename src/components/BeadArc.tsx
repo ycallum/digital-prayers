@@ -68,7 +68,7 @@ export function BeadArc({ current, isCompleting = false }: BeadArcProps) {
       positions.push({ x, y, angle });
     }
 
-    for (let i = rightStackSize - 1; i >= 0; i--) {
+    for (let i = 0; i < rightStackSize; i++) {
       const normalizedPosition = i * rightStackSpacing;
       const angle = endAngle - normalizedPosition;
 
@@ -129,7 +129,7 @@ export function BeadArc({ current, isCompleting = false }: BeadArcProps) {
             if (bead.isActive) {
               return {
                 ...bead,
-                position: RIGHT_STACK_START,
+                position: RIGHT_STACK_START + 6,
                 isActive: true,
                 isTransitioning: true,
               };
@@ -230,7 +230,7 @@ export function BeadArc({ current, isCompleting = false }: BeadArcProps) {
     };
 
     if (bead.isTransitioning) {
-      const pathPoints = getArcPath(6, RIGHT_STACK_START);
+      const pathPoints = getArcPath(6, RIGHT_STACK_START + 6);
       const keyframes = pathPoints.map(p => `${p.x}%`);
       const keyframesY = pathPoints.map(p => `${p.y}%`);
 
@@ -343,11 +343,11 @@ export function BeadArc({ current, isCompleting = false }: BeadArcProps) {
     const pathData = `M ${points.join(' L ')}`;
 
     return (
-      <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+      <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
         <path
           d={pathData}
           stroke="rgba(139, 111, 71, 0.6)"
-          strokeWidth="0.5"
+          strokeWidth="0.3"
           fill="none"
           strokeLinecap="round"
           vectorEffect="non-scaling-stroke"
