@@ -37,7 +37,7 @@ export function SessionTimer() {
   const seconds = elapsed % 60;
 
   return (
-    <div className="flex flex-col items-center gap-4 mt-8">
+    <div className="flex flex-col items-center gap-4 mt-8 relative z-20">
       {state.isSessionActive && (
         <div className={`flex items-center justify-center gap-2 text-sm ${theme.text.secondary} ${theme.transition}`}>
           <Timer className="w-4 h-4" />
@@ -49,7 +49,7 @@ export function SessionTimer() {
 
       <button
         onClick={handleReset}
-        className={`px-4 py-2 rounded-lg ${theme.button.hover} ${theme.transition} disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2 ${theme.text.tertiary} text-sm`}
+        className={`px-5 py-2.5 rounded-lg ${theme.button.hover} ${theme.transition} disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2 ${theme.text.tertiary} text-sm pointer-events-auto`}
         aria-label="Reset count and timer"
         disabled={state.currentCount === 0 && !state.isSessionActive}
       >

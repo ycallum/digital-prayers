@@ -92,7 +92,7 @@ export function CountingArea() {
   };
 
   return (
-    <div className="relative">
+    <div className="relative w-full">
       {state.visualizationMode === 'beads' && (
         <BeadArc
           current={state.currentCount}
@@ -102,7 +102,7 @@ export function CountingArea() {
       )}
 
       <div
-        className="relative cursor-pointer touch-none select-none px-4"
+        className="relative cursor-pointer touch-none select-none px-4 min-h-[280px] flex items-center justify-center"
         onClick={handleIncrement}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
@@ -112,12 +112,14 @@ export function CountingArea() {
         aria-label={`Tap to increment count. Current count: ${state.currentCount} of ${state.totalBeads}`}
       >
         {state.visualizationMode === 'ring' && (
-          <ProgressRing
-            current={state.currentCount}
-            total={state.totalBeads}
-            size={320}
-            isCompleting={state.isCompleting}
-          />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <ProgressRing
+              current={state.currentCount}
+              total={state.totalBeads}
+              size={320}
+              isCompleting={state.isCompleting}
+            />
+          </div>
         )}
 
         <CountDisplay
@@ -129,7 +131,7 @@ export function CountingArea() {
       </div>
 
       {showInstruction && state.currentCount === 0 && (
-        <div className="absolute -bottom-16 left-0 right-0 text-center pointer-events-none">
+        <div className="absolute -bottom-16 left-0 right-0 text-center pointer-events-none z-20">
           <p className="text-xs opacity-40" style={{ color: 'var(--color-text-secondary)' }}>轻触屏幕开始计数</p>
         </div>
       )}
