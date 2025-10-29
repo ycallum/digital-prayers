@@ -17,12 +17,12 @@ interface AnimatedBead {
   id: string;
   position: number;
   isActive: boolean;
+  isTransitioning?: boolean;
 }
 
 let beadIdCounter = 100;
 
 export function BeadArc({ current, isCompleting = false }: BeadArcProps) {
-  const FIXED_BEAD_COUNT = 14;
   const [beads, setBeads] = useState<AnimatedBead[]>([]);
   const [animationQueue, setAnimationQueue] = useState<number[]>([]);
   const isAnimating = useRef(false);
@@ -53,6 +53,21 @@ export function BeadArc({ current, isCompleting = false }: BeadArcProps) {
       positions.push({ x, y, angle });
     }
 
+    const transitionSteps = 20;
+    const lastLeftAngle = startAngle + (leftStackSize - 1) * leftStackSpacing;
+    const firstRightAngle = endAngle;
+    const angleRange = firstRightAngle - lastLeftAngle;
+
+    for (let i = 0; i < transitionSteps; i++) {
+      const t = (i + 1) / (transitionSteps + 1);
+      const angle = lastLeftAngle + angleRange * t;
+
+      const x = centerX + radiusX * Math.cos(angle);
+      const y = centerY + radiusY * Math.sin(angle);
+
+      positions.push({ x, y, angle });
+    }
+
     for (let i = 0; i < rightStackSize; i++) {
       const normalizedPosition = i * rightStackSpacing;
       const angle = endAngle - normalizedPosition;
@@ -68,12 +83,29 @@ export function BeadArc({ current, isCompleting = false }: BeadArcProps) {
 
   const arcPositions = getArcPositions();
 
+  const LEFT_STACK_SIZE = 7;
+  const TRANSITION_STEPS = 20;
+  const RIGHT_STACK_START = LEFT_STACK_SIZE + TRANSITION_STEPS;
+
   useEffect(() => {
-    const initialBeads: AnimatedBead[] = Array.from({ length: FIXED_BEAD_COUNT }, (_, i) => ({
-      id: `bead-${i}`,
-      position: i,
-      isActive: i === 6,
-    }));
+    const initialBeads: AnimatedBead[] = [];
+
+    for (let i = 0; i < LEFT_STACK_SIZE; i++) {
+      initialBeads.push({
+        id: `bead-${i}`,
+        position: i,
+        isActive: i === 6,
+      });
+    }
+
+    for (let i = 0; i < LEFT_STACK_SIZE; i++) {
+      initialBeads.push({
+        id: `bead-${i + LEFT_STACK_SIZE}`,
+        position: RIGHT_STACK_START + i,
+        isActive: false,
+      });
+    }
+
     setBeads(initialBeads);
   }, []);
 
@@ -97,8 +129,9 @@ export function BeadArc({ current, isCompleting = false }: BeadArcProps) {
             if (bead.isActive) {
               return {
                 ...bead,
-                position: 7,
+                position: RIGHT_STACK_START,
                 isActive: true,
+                isTransitioning: true,
               };
             }
             return bead;
@@ -109,9 +142,9 @@ export function BeadArc({ current, isCompleting = false }: BeadArcProps) {
 
         setTimeout(() => {
           setBeads(prevBeads => {
-            const leftBeads = prevBeads.filter(b => b.position < 7 && !b.isActive);
+            const leftBeads = prevBeads.filter(b => b.position < LEFT_STACK_SIZE && !b.isActive);
             const activeBead = prevBeads.find(b => b.isActive);
-            const rightBeads = prevBeads.filter(b => b.position >= 7 && !b.isActive);
+            const rightBeads = prevBeads.filter(b => b.position >= RIGHT_STACK_START && !b.isActive);
 
             const rebalancedBeads: AnimatedBead[] = [];
 
@@ -131,18 +164,18 @@ export function BeadArc({ current, isCompleting = false }: BeadArcProps) {
             });
 
             if (activeBead) {
-              rightBeads.push(activeBead);
+              rightBeads.push({ ...activeBead, isTransitioning: false });
             }
 
             rightBeads.slice(0, 6).forEach((bead, idx) => {
               rebalancedBeads.push({
                 ...bead,
-                position: 7 + idx,
+                position: RIGHT_STACK_START + idx,
                 isActive: false,
               });
             });
 
-            const leftStackCount = rebalancedBeads.filter(b => b.position < 7).length;
+            const leftStackCount = rebalancedBeads.filter(b => b.position < LEFT_STACK_SIZE).length;
             if (leftStackCount > 0) {
               const lastLeftIndex = rebalancedBeads.findIndex(b => b.position === leftStackCount - 1);
               if (lastLeftIndex >= 0) {
@@ -157,17 +190,70 @@ export function BeadArc({ current, isCompleting = false }: BeadArcProps) {
             isAnimating.current = false;
             setAnimationQueue(prev => prev.slice(1));
           }, 400);
-        }, 600);
+        }, 800);
       }, 50);
     }
-  }, [animationQueue]);
+  }, [animationQueue, LEFT_STACK_SIZE, RIGHT_STACK_START]);
 
   const beadSize = 'w-6 h-6 md:w-7 md:h-7';
+
+  const getArcPath = (fromPos: number, toPos: number): { x: number; y: number }[] => {
+    const path: { x: number; y: number }[] = [];
+    const step = fromPos < toPos ? 1 : -1;
+
+    for (let i = fromPos; step > 0 ? i <= toPos : i >= toPos; i += step) {
+      if (i >= 0 && i < arcPositions.length) {
+        path.push({ x: arcPositions[i].x, y: arcPositions[i].y });
+      }
+    }
+
+    return path;
+  };
 
   const renderBead = (bead: AnimatedBead, actualPosition: number, isActive: boolean) => {
     if (actualPosition < 0 || actualPosition >= arcPositions.length) return null;
 
     const pos = arcPositions[actualPosition];
+
+    const animateProps: any = {
+      left: `${pos.x}%`,
+      top: `${pos.y}%`,
+      opacity: 1,
+      scale: isCompleting && isActive ? [1, 1.25, 1] : 1,
+    };
+
+    let transitionProps: any = {
+      opacity: { duration: 0.3 },
+      scale: isCompleting && isActive
+        ? { duration: 1.5, repeat: Infinity, ease: 'easeInOut' }
+        : { duration: 0.3 },
+    };
+
+    if (bead.isTransitioning) {
+      const pathPoints = getArcPath(6, RIGHT_STACK_START);
+      const keyframes = pathPoints.map(p => `${p.x}%`);
+      const keyframesY = pathPoints.map(p => `${p.y}%`);
+
+      animateProps.left = keyframes;
+      animateProps.top = keyframesY;
+
+      transitionProps = {
+        ...transitionProps,
+        left: {
+          duration: 0.8,
+          ease: [0.4, 0.0, 0.2, 1],
+          times: keyframes.map((_, i) => i / (keyframes.length - 1))
+        },
+        top: {
+          duration: 0.8,
+          ease: [0.4, 0.0, 0.2, 1],
+          times: keyframesY.map((_, i) => i / (keyframesY.length - 1))
+        },
+      };
+    } else {
+      transitionProps.left = { type: 'spring', damping: 20, stiffness: 120, duration: 0.5 };
+      transitionProps.top = { type: 'spring', damping: 20, stiffness: 120, duration: 0.5 };
+    }
 
     return (
       <motion.div
@@ -179,25 +265,13 @@ export function BeadArc({ current, isCompleting = false }: BeadArcProps) {
           opacity: 0,
           scale: 0.5,
         }}
-        animate={{
-          left: `${pos.x}%`,
-          top: `${pos.y}%`,
-          opacity: 1,
-          scale: isCompleting && isActive ? [1, 1.25, 1] : 1,
-        }}
+        animate={animateProps}
         exit={{
           opacity: 0,
           scale: 0.5,
           transition: { duration: 0.3 }
         }}
-        transition={{
-          left: { type: 'spring', damping: 20, stiffness: 120, duration: 0.5 },
-          top: { type: 'spring', damping: 20, stiffness: 120, duration: 0.5 },
-          opacity: { duration: 0.3 },
-          scale: isCompleting && isActive
-            ? { duration: 1.5, repeat: Infinity, ease: 'easeInOut' }
-            : { duration: 0.3 },
-        }}
+        transition={transitionProps}
         style={{
           transform: 'translate(-50%, -50%)',
           zIndex: isActive ? 10 : 9,
@@ -254,16 +328,19 @@ export function BeadArc({ current, isCompleting = false }: BeadArcProps) {
 
   const renderArcLine = () => {
     const leftEndPos = arcPositions[6];
-    const rightEndPos = arcPositions[7];
+    const rightEndPos = arcPositions[RIGHT_STACK_START];
 
     if (!leftEndPos || !rightEndPos) return null;
 
-    const centerX = 50;
-    const centerY = 50;
+    const points: string[] = [];
+    for (let i = 6; i <= RIGHT_STACK_START; i++) {
+      const pos = arcPositions[i];
+      if (pos) {
+        points.push(`${pos.x},${pos.y}`);
+      }
+    }
 
-    const controlPointY = centerY + 50;
-
-    const pathData = `M ${leftEndPos.x} ${leftEndPos.y} Q ${centerX} ${controlPointY} ${rightEndPos.x} ${rightEndPos.y}`;
+    const pathData = `M ${points.join(' L ')}`;
 
     return (
       <svg className="absolute inset-0 w-full h-full">
