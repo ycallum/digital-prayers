@@ -1,4 +1,5 @@
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect, useRef } from 'react';
 
 interface BeadArcProps {
   current: number;
@@ -12,8 +13,18 @@ interface BeadPosition {
   angle: number;
 }
 
-export function BeadArc({ current, total, isCompleting = false }: BeadArcProps) {
-  const displayBeadCount = Math.min(total, 33);
+interface AnimatedBead {
+  id: string;
+  position: number;
+  isActive: boolean;
+}
+
+export function BeadArc({ current, isCompleting = false }: BeadArcProps) {
+  const FIXED_BEAD_COUNT = 14;
+  const [beads, setBeads] = useState<AnimatedBead[]>([]);
+  const [animationQueue, setAnimationQueue] = useState<number[]>([]);
+  const isAnimating = useRef(false);
+  const previousCount = useRef(current);
 
   const getArcPositions = (): BeadPosition[] => {
     const positions: BeadPosition[] = [];
@@ -21,8 +32,8 @@ export function BeadArc({ current, total, isCompleting = false }: BeadArcProps) 
     const endAngle = Math.PI * 2.25;
     const angleRange = endAngle - startAngle;
 
-    for (let i = 0; i < displayBeadCount; i++) {
-      const normalizedPosition = i / (displayBeadCount - 1);
+    for (let i = 0; i < FIXED_BEAD_COUNT; i++) {
+      const normalizedPosition = i / (FIXED_BEAD_COUNT - 1);
       const angle = startAngle + (normalizedPosition * angleRange);
 
       const centerX = 50;
@@ -40,17 +51,133 @@ export function BeadArc({ current, total, isCompleting = false }: BeadArcProps) 
   };
 
   const arcPositions = getArcPositions();
-  const progressRatio = current / total;
-  const currentBeadIndex = Math.floor(progressRatio * displayBeadCount);
-  const beadsBehind = Math.max(0, currentBeadIndex - 2);
 
-  const getBeadSize = () => {
-    if (displayBeadCount <= 27) return 'w-6 h-6 md:w-7 md:h-7';
-    if (displayBeadCount <= 54) return 'w-5 h-5 md:w-6 md:h-6';
-    return 'w-4 h-4 md:w-5 md:h-5';
+  useEffect(() => {
+    const initialBeads: AnimatedBead[] = Array.from({ length: FIXED_BEAD_COUNT }, (_, i) => ({
+      id: `bead-${i}`,
+      position: i,
+      isActive: i === 0,
+    }));
+    setBeads(initialBeads);
+  }, []);
+
+  useEffect(() => {
+    if (current > previousCount.current) {
+      setAnimationQueue(prev => [...prev, current]);
+    }
+    previousCount.current = current;
+  }, [current]);
+
+  useEffect(() => {
+    if (animationQueue.length > 0 && !isAnimating.current) {
+      isAnimating.current = true;
+
+      setTimeout(() => {
+        setBeads(prevBeads => {
+          const newBeads = prevBeads.map(bead => ({
+            ...bead,
+            position: bead.position + 1,
+            isActive: bead.isActive,
+          }));
+
+          return newBeads;
+        });
+
+        setTimeout(() => {
+          setBeads(prevBeads => {
+            const rebalancedBeads = prevBeads.map((bead, idx) => ({
+              ...bead,
+              position: idx,
+            }));
+            return rebalancedBeads;
+          });
+
+          setTimeout(() => {
+            isAnimating.current = false;
+            setAnimationQueue(prev => prev.slice(1));
+          }, 400);
+        }, 600);
+      }, 50);
+    }
+  }, [animationQueue]);
+
+  const beadSize = 'w-6 h-6 md:w-7 md:h-7';
+
+  const renderBead = (bead: AnimatedBead, actualPosition: number, isActive: boolean) => {
+    if (actualPosition < 0 || actualPosition >= arcPositions.length) return null;
+
+    const pos = arcPositions[actualPosition];
+
+    return (
+      <motion.div
+        key={bead.id}
+        className={`absolute ${beadSize} rounded-full`}
+        initial={{ left: `${pos.x}%`, top: `${pos.y}%` }}
+        animate={{
+          left: `${pos.x}%`,
+          top: `${pos.y}%`,
+          scale: isCompleting && isActive ? [1, 1.25, 1] : 1,
+        }}
+        transition={{
+          left: { type: 'spring', damping: 20, stiffness: 120, duration: 0.5 },
+          top: { type: 'spring', damping: 20, stiffness: 120, duration: 0.5 },
+          scale: isCompleting && isActive
+            ? { duration: 1.5, repeat: Infinity, ease: 'easeInOut' }
+            : { duration: 0.2 },
+        }}
+        style={{
+          transform: 'translate(-50%, -50%)',
+          zIndex: isActive ? 10 : 9,
+        }}
+      >
+        <div
+          className="absolute inset-0 rounded-full"
+          style={{
+            background: isActive
+              ? 'radial-gradient(circle at 30% 30%, #f9e79f, #f4d03f 35%, #d4af37 60%, #8b6914 85%, #4a3508)'
+              : 'radial-gradient(circle at 30% 30%, #d4af37, #b8941f 45%, #8b6914 75%, #4a3508)',
+            boxShadow: isActive
+              ? `
+                0 3px 6px rgba(0, 0, 0, 0.3),
+                0 5px 12px rgba(0, 0, 0, 0.2),
+                inset 0 2px 3px rgba(255, 255, 255, 0.4),
+                inset 0 -2px 4px rgba(0, 0, 0, 0.4),
+                ${isCompleting ? '0 0 20px rgba(244, 208, 63, 0.8), 0 0 40px rgba(212, 175, 55, 0.4)' : '0 0 15px rgba(244, 208, 63, 0.5)'}
+              `
+              : `
+                0 2px 4px rgba(0, 0, 0, 0.3),
+                0 3px 8px rgba(0, 0, 0, 0.2),
+                inset 0 1px 2px rgba(255, 255, 255, 0.3),
+                inset 0 -1px 2px rgba(0, 0, 0, 0.4)
+              `,
+          }}
+        />
+        <div
+          className="absolute rounded-full bg-white"
+          style={{
+            top: isActive ? '18%' : '20%',
+            left: isActive ? '22%' : '25%',
+            width: isActive ? '40%' : '35%',
+            height: isActive ? '40%' : '35%',
+            opacity: isActive ? 0.6 : 0.4,
+            filter: isActive ? 'blur(4px)' : 'blur(3px)',
+          }}
+        />
+        {isActive && (
+          <div
+            className="absolute rounded-full"
+            style={{
+              top: '12%',
+              left: '18%',
+              width: '30%',
+              height: '30%',
+              background: 'radial-gradient(circle, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0) 70%)',
+            }}
+          />
+        )}
+      </motion.div>
+    );
   };
-
-  const beadSize = getBeadSize();
 
   return (
     <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
@@ -74,115 +201,9 @@ export function BeadArc({ current, total, isCompleting = false }: BeadArcProps) 
         })}
       </svg>
 
-      {current > 0 && currentBeadIndex < displayBeadCount && (
-        <motion.div
-          className={`absolute ${beadSize} rounded-full`}
-          initial={false}
-          animate={{
-            left: `${arcPositions[currentBeadIndex].x}%`,
-            top: `${arcPositions[currentBeadIndex].y}%`,
-            scale: isCompleting ? [1, 1.25, 1] : 1,
-          }}
-          transition={{
-            left: { type: 'spring', damping: 25, stiffness: 150, duration: 0.6 },
-            top: { type: 'spring', damping: 25, stiffness: 150, duration: 0.6 },
-            scale: isCompleting
-              ? { duration: 1.5, repeat: Infinity, ease: 'easeInOut' }
-              : { duration: 0.2 },
-          }}
-          style={{
-            transform: 'translate(-50%, -50%)',
-            zIndex: 10,
-          }}
-        >
-          <div
-            className="absolute inset-0 rounded-full"
-            style={{
-              background: 'radial-gradient(circle at 30% 30%, #f9e79f, #f4d03f 35%, #d4af37 60%, #8b6914 85%, #4a3508)',
-              boxShadow: `
-                0 3px 6px rgba(0, 0, 0, 0.3),
-                0 5px 12px rgba(0, 0, 0, 0.2),
-                inset 0 2px 3px rgba(255, 255, 255, 0.4),
-                inset 0 -2px 4px rgba(0, 0, 0, 0.4),
-                ${isCompleting ? '0 0 20px rgba(244, 208, 63, 0.8), 0 0 40px rgba(212, 175, 55, 0.4)' : '0 0 15px rgba(244, 208, 63, 0.5)'}
-              `,
-            }}
-          />
-          <div
-            className="absolute rounded-full bg-white"
-            style={{
-              top: '18%',
-              left: '22%',
-              width: '40%',
-              height: '40%',
-              opacity: 0.6,
-              filter: 'blur(4px)',
-            }}
-          />
-          <div
-            className="absolute rounded-full"
-            style={{
-              top: '12%',
-              left: '18%',
-              width: '30%',
-              height: '30%',
-              background: 'radial-gradient(circle, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0) 70%)',
-            }}
-          />
-        </motion.div>
-      )}
-
-      {beadsBehind > 0 && Array.from({ length: Math.min(beadsBehind, 3) }).map((_, idx) => {
-        const beadIndex = currentBeadIndex - (idx + 1);
-        if (beadIndex < 0) return null;
-        const opacity = 1 - (idx * 0.3);
-
-        return (
-          <motion.div
-            key={`trail-${beadIndex}`}
-            className={`absolute ${beadSize} rounded-full`}
-            style={{
-              left: `${arcPositions[beadIndex].x}%`,
-              top: `${arcPositions[beadIndex].y}%`,
-              transform: 'translate(-50%, -50%)',
-              opacity,
-              zIndex: 9 - idx,
-            }}
-          >
-            <div
-              className="absolute inset-0 rounded-full"
-              style={{
-                background: 'radial-gradient(circle at 30% 30%, #d4af37, #b8941f 45%, #8b6914 75%, #4a3508)',
-                boxShadow: `
-                  0 2px 4px rgba(0, 0, 0, 0.3),
-                  0 3px 8px rgba(0, 0, 0, 0.2),
-                  inset 0 1px 2px rgba(255, 255, 255, 0.3),
-                  inset 0 -1px 2px rgba(0, 0, 0, 0.4)
-                `,
-              }}
-            />
-            <div
-              className="absolute rounded-full bg-white"
-              style={{
-                top: '20%',
-                left: '25%',
-                width: '35%',
-                height: '35%',
-                opacity: 0.4,
-                filter: 'blur(3px)',
-              }}
-            />
-          </motion.div>
-        );
-      })}
-
-      {total > displayBeadCount && (
-        <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 text-xs opacity-40 pointer-events-none">
-          <span style={{ color: 'var(--color-text-secondary)' }}>
-            Showing {displayBeadCount} of {total} beads
-          </span>
-        </div>
-      )}
+      <AnimatePresence>
+        {beads.map((bead) => renderBead(bead, bead.position, bead.isActive))}
+      </AnimatePresence>
     </div>
   );
 }
