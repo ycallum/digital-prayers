@@ -19,6 +19,8 @@ interface AnimatedBead {
   isActive: boolean;
 }
 
+let beadIdCounter = 100;
+
 export function BeadArc({ current, isCompleting = false }: BeadArcProps) {
   const FIXED_BEAD_COUNT = 14;
   const [beads, setBeads] = useState<AnimatedBead[]>([]);
@@ -113,10 +115,17 @@ export function BeadArc({ current, isCompleting = false }: BeadArcProps) {
 
             const rebalancedBeads: AnimatedBead[] = [];
 
-            leftBeads.slice(1).forEach((bead, idx) => {
+            const newBead: AnimatedBead = {
+              id: `bead-${beadIdCounter++}`,
+              position: 0,
+              isActive: false,
+            };
+            rebalancedBeads.push(newBead);
+
+            leftBeads.forEach((bead, idx) => {
               rebalancedBeads.push({
                 ...bead,
-                position: idx,
+                position: idx + 1,
                 isActive: false,
               });
             });
@@ -125,7 +134,7 @@ export function BeadArc({ current, isCompleting = false }: BeadArcProps) {
               rightBeads.push(activeBead);
             }
 
-            rightBeads.forEach((bead, idx) => {
+            rightBeads.slice(0, 6).forEach((bead, idx) => {
               rebalancedBeads.push({
                 ...bead,
                 position: 7 + idx,
@@ -133,9 +142,12 @@ export function BeadArc({ current, isCompleting = false }: BeadArcProps) {
               });
             });
 
-            const newActiveIndex = rebalancedBeads.length > 7 ? 6 : Math.max(0, rebalancedBeads.findIndex(b => b.position < 7));
-            if (newActiveIndex >= 0 && rebalancedBeads[newActiveIndex]) {
-              rebalancedBeads[newActiveIndex].isActive = true;
+            const leftStackCount = rebalancedBeads.filter(b => b.position < 7).length;
+            if (leftStackCount > 0) {
+              const lastLeftIndex = rebalancedBeads.findIndex(b => b.position === leftStackCount - 1);
+              if (lastLeftIndex >= 0) {
+                rebalancedBeads[lastLeftIndex].isActive = true;
+              }
             }
 
             return rebalancedBeads;
@@ -161,18 +173,30 @@ export function BeadArc({ current, isCompleting = false }: BeadArcProps) {
       <motion.div
         key={bead.id}
         className={`absolute ${beadSize} rounded-full`}
-        initial={{ left: `${pos.x}%`, top: `${pos.y}%` }}
+        initial={{
+          left: `${pos.x}%`,
+          top: `${pos.y}%`,
+          opacity: 0,
+          scale: 0.5,
+        }}
         animate={{
           left: `${pos.x}%`,
           top: `${pos.y}%`,
+          opacity: 1,
           scale: isCompleting && isActive ? [1, 1.25, 1] : 1,
+        }}
+        exit={{
+          opacity: 0,
+          scale: 0.5,
+          transition: { duration: 0.3 }
         }}
         transition={{
           left: { type: 'spring', damping: 20, stiffness: 120, duration: 0.5 },
           top: { type: 'spring', damping: 20, stiffness: 120, duration: 0.5 },
+          opacity: { duration: 0.3 },
           scale: isCompleting && isActive
             ? { duration: 1.5, repeat: Infinity, ease: 'easeInOut' }
-            : { duration: 0.2 },
+            : { duration: 0.3 },
         }}
         style={{
           transform: 'translate(-50%, -50%)',
@@ -228,29 +252,37 @@ export function BeadArc({ current, isCompleting = false }: BeadArcProps) {
     );
   };
 
+  const renderArcLine = () => {
+    const leftEndPos = arcPositions[6];
+    const rightEndPos = arcPositions[7];
+
+    if (!leftEndPos || !rightEndPos) return null;
+
+    const centerX = 50;
+    const centerY = 50;
+
+    const controlPointY = centerY + 50;
+
+    const pathData = `M ${leftEndPos.x} ${leftEndPos.y} Q ${centerX} ${controlPointY} ${rightEndPos.x} ${rightEndPos.y}`;
+
+    return (
+      <svg className="absolute inset-0 w-full h-full">
+        <path
+          d={pathData}
+          stroke="rgba(139, 111, 71, 0.25)"
+          strokeWidth="2"
+          fill="none"
+          strokeLinecap="round"
+        />
+      </svg>
+    );
+  };
+
   return (
     <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-      <svg className="absolute inset-0 w-full h-full">
-        {arcPositions.map((pos, i) => {
-          const nextPos = arcPositions[i + 1];
-          if (!nextPos) return null;
+      {renderArcLine()}
 
-          return (
-            <line
-              key={`line-${i}`}
-              x1={`${pos.x}%`}
-              y1={`${pos.y}%`}
-              x2={`${nextPos.x}%`}
-              y2={`${nextPos.y}%`}
-              stroke="rgba(139, 111, 71, 0.25)"
-              strokeWidth="2"
-              strokeLinecap="round"
-            />
-          );
-        })}
-      </svg>
-
-      <AnimatePresence>
+      <AnimatePresence mode="popLayout">
         {beads.map((bead) => renderBead(bead, bead.position, bead.isActive))}
       </AnimatePresence>
     </div>
