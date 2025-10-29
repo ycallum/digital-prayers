@@ -22,7 +22,7 @@ export default defineConfig({
       manifest: {
         name: '电子念珠',
         short_name: '念珠',
-        description: 'Digital prayer beads for mindful practice',
+        description: 'Digital tasbih counter for mindful practice',
         theme_color: '#88B9A2',
         background_color: '#F5F1E8',
         display: 'standalone',
@@ -58,7 +58,4 @@ export default defineConfig({
       }
     })
   ],
-  optimizeDeps: {
-    exclude: ['lucide-react'],
-  },
 });
