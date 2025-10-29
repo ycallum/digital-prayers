@@ -343,13 +343,14 @@ export function BeadArc({ current, isCompleting = false }: BeadArcProps) {
     const pathData = `M ${points.join(' L ')}`;
 
     return (
-      <svg className="absolute inset-0 w-full h-full">
+      <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
         <path
           d={pathData}
           stroke="rgba(139, 111, 71, 0.6)"
-          strokeWidth="3"
+          strokeWidth="0.5"
           fill="none"
           strokeLinecap="round"
+          vectorEffect="non-scaling-stroke"
         />
       </svg>
     );
