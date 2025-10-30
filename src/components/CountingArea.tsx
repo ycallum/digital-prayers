@@ -1,12 +1,13 @@
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useCallback, memo } from 'react';
 import { ProgressRing } from './ProgressRing';
+import { BeadArc } from './BeadArc';
 import { CountDisplay } from './CountDisplay';
 import { CompletionEffect } from './CompletionEffect';
 import { useApp } from '../context/AppContext';
 import { haptics } from '../lib/haptics';
 import { audioManager } from '../lib/audio';
 
-export function CountingArea() {
+export const CountingArea = memo(function CountingArea() {
   const { state, dispatch } = useApp();
   const touchStartX = useRef(0);
   const touchStartY = useRef(0);
@@ -34,7 +35,7 @@ export function CountingArea() {
     }
   }, [state.isCompleting, state.audioEnabled, state.audioVolume, dispatch]);
 
-  const handleIncrement = () => {
+  const handleIncrement = useCallback(() => {
     if (state.isCompleting) return;
 
     dispatch({ type: 'INCREMENT_COUNT' });
@@ -43,16 +44,16 @@ export function CountingArea() {
       audioManager.play('click', state.audioVolume / 100);
     }
     haptics.light();
-  };
+  }, [state.isCompleting, state.audioEnabled, state.currentCount, state.totalBeads, state.audioVolume, dispatch]);
 
-  const handleDecrement = () => {
+  const handleDecrement = useCallback(() => {
     if (state.isCompleting || state.currentCount === 0) return;
 
     dispatch({ type: 'DECREMENT_COUNT' });
     haptics.light();
-  };
+  }, [state.isCompleting, state.currentCount, dispatch]);
 
-  const handleTouchStart = (e: React.TouchEvent) => {
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
     const touch = e.touches[0];
     touchStartX.current = touch.clientX;
     touchStartY.current = touch.clientY;
@@ -60,16 +61,16 @@ export function CountingArea() {
     longPressTimer.current = window.setTimeout(() => {
       haptics.medium();
     }, 800);
-  };
+  }, []);
 
-  const handleTouchMove = () => {
+  const handleTouchMove = useCallback(() => {
     if (longPressTimer.current) {
       clearTimeout(longPressTimer.current);
       longPressTimer.current = null;
     }
-  };
+  }, []);
 
-  const handleTouchEnd = (e: React.TouchEvent) => {
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
     if (longPressTimer.current) {
       clearTimeout(longPressTimer.current);
       longPressTimer.current = null;
@@ -88,12 +89,20 @@ export function CountingArea() {
     } else if (Math.abs(deltaX) < 10 && Math.abs(deltaY) < 10) {
       handleIncrement();
     }
-  };
+  }, [handleIncrement, handleDecrement]);
 
   return (
-    <div className="relative px-4">
+    <div className="relative w-full">
+      {state.visualizationMode === 'beads' && (
+        <BeadArc
+          current={state.currentCount}
+          total={state.totalBeads}
+          isCompleting={state.isCompleting}
+        />
+      )}
+
       <div
-        className="relative cursor-pointer touch-none select-none"
+        className="relative cursor-pointer touch-none select-none px-4 min-h-[280px] flex items-center justify-center"
         onClick={handleIncrement}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
@@ -101,13 +110,22 @@ export function CountingArea() {
         role="button"
         tabIndex={0}
         aria-label={`Tap to increment count. Current count: ${state.currentCount} of ${state.totalBeads}`}
+        style={{
+          WebkitTapHighlightColor: 'transparent',
+          touchAction: 'none'
+        }}
       >
-        <ProgressRing
-          current={state.currentCount}
-          total={state.totalBeads}
-          size={320}
-          isCompleting={state.isCompleting}
-        />
+        {state.visualizationMode === 'ring' && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <ProgressRing
+              current={state.currentCount}
+              total={state.totalBeads}
+              size={320}
+              isCompleting={state.isCompleting}
+            />
+          </div>
+        )}
+
         <CountDisplay
           current={state.currentCount}
           total={state.totalBeads}
@@ -117,10 +135,10 @@ export function CountingArea() {
       </div>
 
       {showInstruction && state.currentCount === 0 && (
-        <div className="absolute -bottom-16 left-0 right-0 text-center">
-          <p className="text-xs text-zen-400">轻触屏幕开始计数</p>
+        <div className="absolute -bottom-16 left-0 right-0 text-center pointer-events-none z-20">
+          <p className="text-xs opacity-40" style={{ color: 'var(--color-text-secondary)' }}>轻触屏幕开始计数</p>
         </div>
       )}
     </div>
   );
-}
+});

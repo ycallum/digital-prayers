@@ -1,5 +1,5 @@
-import { useRef, useMemo } from 'react';
-import { motion, useScroll, useTransform, MotionValue } from 'framer-motion';
+import { memo, useMemo } from 'react';
+import { getThemeClasses } from '../lib/theme';
 
 interface Word {
   text: string;
@@ -28,53 +28,74 @@ const words: Word[] = [
   { text: '法', x: '45%', y: '10%', size: '6rem', opacity: 0.03, speed: 0.21 },
 ];
 
-interface AnimatedWordProps {
-  word: Word;
-  scrollY: MotionValue<number>;
-}
-
-function AnimatedWord({ word, scrollY }: AnimatedWordProps) {
-  const y = useTransform(
-    scrollY,
-    [0, 1000],
-    [0, -word.speed * 100]
-  );
-
-  return (
-    <motion.div
-      style={{
-        position: 'absolute',
-        left: word.x,
-        top: word.y,
-        fontSize: word.size,
-        opacity: word.opacity,
-        y,
-      }}
-      className="font-serif text-zen-300 select-none"
-    >
-      {word.text}
-    </motion.div>
-  );
-}
-
-export function BackgroundWords() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const { scrollY } = useScroll();
+export const BackgroundWords = memo(function BackgroundWords() {
+  const theme = getThemeClasses();
 
   const wordElements = useMemo(
-    () => words.map((word, index) => (
-      <AnimatedWord key={index} word={word} scrollY={scrollY} />
-    )),
-    [scrollY]
+    () =>
+      words.map((word, index) => (
+        <div
+          key={index}
+          className="word-parallax"
+          style={{
+            position: 'absolute',
+            left: word.x,
+            top: word.y,
+            fontSize: word.size,
+            opacity: word.opacity,
+            transform: `translateZ(0)`,
+            willChange: 'transform',
+          }}
+          data-speed={word.speed}
+        >
+          {word.text}
+        </div>
+      )),
+    []
   );
 
   return (
-    <div
-      ref={containerRef}
-      className="fixed inset-0 pointer-events-none overflow-hidden"
-      style={{ zIndex: 0 }}
-    >
-      {wordElements}
-    </div>
+    <>
+      <div
+        className={`fixed inset-0 pointer-events-none overflow-hidden font-serif select-none ${theme.text.secondary} ${theme.transition}`}
+        style={{
+          zIndex: 0,
+          perspective: '1000px',
+        }}
+      >
+        {wordElements}
+      </div>
+      <style>{`
+        @media (prefers-reduced-motion: no-preference) {
+          @supports (animation-timeline: scroll()) {
+            .word-parallax {
+              animation: parallaxScroll linear;
+              animation-timeline: scroll(root);
+            }
+
+            @keyframes parallaxScroll {
+              to {
+                transform: translateY(calc(var(--speed, 0.2) * -100px)) translateZ(0);
+              }
+            }
+
+            .word-parallax[data-speed="0.12"] { --speed: 0.12; }
+            .word-parallax[data-speed="0.14"] { --speed: 0.14; }
+            .word-parallax[data-speed="0.15"] { --speed: 0.15; }
+            .word-parallax[data-speed="0.16"] { --speed: 0.16; }
+            .word-parallax[data-speed="0.17"] { --speed: 0.17; }
+            .word-parallax[data-speed="0.18"] { --speed: 0.18; }
+            .word-parallax[data-speed="0.19"] { --speed: 0.19; }
+            .word-parallax[data-speed="0.2"] { --speed: 0.2; }
+            .word-parallax[data-speed="0.21"] { --speed: 0.21; }
+            .word-parallax[data-speed="0.22"] { --speed: 0.22; }
+            .word-parallax[data-speed="0.25"] { --speed: 0.25; }
+            .word-parallax[data-speed="0.26"] { --speed: 0.26; }
+            .word-parallax[data-speed="0.28"] { --speed: 0.28; }
+            .word-parallax[data-speed="0.3"] { --speed: 0.3; }
+          }
+        }
+      `}</style>
+    </>
   );
-}
+});

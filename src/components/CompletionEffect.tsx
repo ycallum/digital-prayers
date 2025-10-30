@@ -1,10 +1,11 @@
+import { memo } from 'react';
 import { motion } from 'framer-motion';
 
 interface CompletionEffectProps {
   isVisible: boolean;
 }
 
-export function CompletionEffect({ isVisible }: CompletionEffectProps) {
+export const CompletionEffect = memo(function CompletionEffect({ isVisible }: CompletionEffectProps) {
   if (!isVisible) return null;
 
   const petals = Array.from({ length: 6 });
@@ -44,6 +45,7 @@ export function CompletionEffect({ isVisible }: CompletionEffectProps) {
           style={{
             left: '50%',
             top: '50%',
+            willChange: 'transform, opacity',
           }}
         />
       ))}
@@ -53,9 +55,10 @@ export function CompletionEffect({ isVisible }: CompletionEffectProps) {
         animate={{ opacity: [0, 1, 1, 0], scale: [0.8, 1, 1, 1.2] }}
         transition={{ duration: 1.5, times: [0, 0.2, 0.8, 1] }}
         className="absolute inset-0 flex items-center justify-center"
+        style={{ willChange: 'transform, opacity' }}
       >
         <span className="text-4xl font-bold text-gold">圆满！</span>
       </motion.div>
     </div>
   );
-}
+});

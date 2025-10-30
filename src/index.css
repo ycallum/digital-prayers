@@ -1,6 +1,73 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&family=Noto+Sans+SC:wght@300;400;700&display=swap');
 @import "tailwindcss";
 
+:root {
+  --transition-duration: 500ms;
+}
+
+.theme-default {
+  --color-background: #F5F1E8;
+  --color-background-dark: #E8E2D5;
+  --color-text-primary: #2D2C28;
+  --color-text-secondary: #6F6B63;
+  --color-text-tertiary: #5A5650;
+  --color-accent-primary: #88B9A2;
+  --color-accent-secondary: #8B6F47;
+  --color-accent-light: #DCEEE6;
+  --color-progress: #88B9A2;
+  --color-progress-glow: #D4AF37;
+  --color-ring: #88B9A2;
+  --color-ring-background: #A78B66;
+  --color-button-background: #E8E6E3;
+  --color-button-hover: #D1CEC9;
+  --color-button-text: #3A3A3A;
+  --color-bead-inactive: #6E5836;
+  --color-bead-active: #D4AF37;
+  --color-border: rgba(111, 107, 99, 0.3);
+}
+
+.theme-warm {
+  --color-background: #FFFCF7;
+  --color-background-dark: #FFF8ED;
+  --color-text-primary: #7A4117;
+  --color-text-secondary: #A0551F;
+  --color-text-tertiary: #C86B2A;
+  --color-accent-primary: #FFA04D;
+  --color-accent-secondary: #A07C44;
+  --color-accent-light: #FFE0BC;
+  --color-progress: #FFB870;
+  --color-progress-glow: #FFC107;
+  --color-ring: #FFB870;
+  --color-ring-background: #FFD89E;
+  --color-button-background: #FFEFD9;
+  --color-button-hover: #FFE4BD;
+  --color-button-text: #7A4117;
+  --color-bead-inactive: #C89856;
+  --color-bead-active: #FFC107;
+  --color-border: rgba(160, 85, 31, 0.3);
+}
+
+.theme-night {
+  --color-background: #0F172A;
+  --color-background-dark: #1E293B;
+  --color-text-primary: #F1F5F9;
+  --color-text-secondary: #94A3B8;
+  --color-text-tertiary: #CBD5E1;
+  --color-accent-primary: #94A3B8;
+  --color-accent-secondary: #2C3E5C;
+  --color-accent-light: #64748B;
+  --color-progress: #94A3B8;
+  --color-progress-glow: #CBD5E1;
+  --color-ring: #94A3B8;
+  --color-ring-background: #334155;
+  --color-button-background: #1E293B;
+  --color-button-hover: #334155;
+  --color-button-text: #F1F5F9;
+  --color-bead-inactive: #334155;
+  --color-bead-active: #CBD5E1;
+  --color-border: rgba(148, 163, 184, 0.3);
+}
+
 @layer base {
   * {
     -webkit-tap-highlight-color: transparent;
@@ -9,11 +76,96 @@
   body {
     overscroll-behavior: none;
     touch-action: pan-y;
+    transition: background-color var(--transition-duration) ease, color var(--transition-duration) ease;
+  }
+
+  .theme-default,
+  .theme-warm,
+  .theme-night {
+    transition: background-color var(--transition-duration) ease, color var(--transition-duration) ease;
   }
 }
 
 @layer utilities {
   .touch-none {
     touch-action: none;
+  }
+
+  .bg-theme {
+    background-color: var(--color-background);
+  }
+
+  .bg-theme-dark {
+    background-color: var(--color-background-dark);
+  }
+
+  .text-theme-primary {
+    color: var(--color-text-primary);
+  }
+
+  .text-theme-secondary {
+    color: var(--color-text-secondary);
+  }
+
+  .text-theme-tertiary {
+    color: var(--color-text-tertiary);
+  }
+
+  .text-theme-accent {
+    color: var(--color-accent-primary);
+  }
+
+  .text-theme-accent-secondary {
+    color: var(--color-accent-secondary);
+  }
+
+  .text-theme-progress {
+    color: var(--color-progress);
+  }
+
+  .text-theme-progress-glow {
+    color: var(--color-progress-glow);
+  }
+
+  .stroke-theme-ring {
+    stroke: var(--color-ring);
+  }
+
+  .stroke-theme-ring-bg {
+    stroke: var(--color-ring-background);
+  }
+
+  .stroke-theme-accent {
+    stroke: var(--color-accent-secondary);
+  }
+
+  .bg-theme-button {
+    background-color: var(--color-button-background);
+  }
+
+  .hover\:bg-theme-button-hover:hover {
+    background-color: var(--color-button-hover);
+  }
+
+  .bg-theme-bead-inactive {
+    background-color: var(--color-bead-inactive);
+  }
+
+  .bg-theme-bead-active {
+    background-color: var(--color-bead-active);
+  }
+
+  .border-theme {
+    border-color: var(--color-border);
+  }
+
+  .divide-theme > :not([hidden]) ~ :not([hidden]) {
+    border-color: var(--color-border);
+  }
+
+  .transition-theme {
+    transition-property: background-color, color, border-color, stroke;
+    transition-duration: var(--transition-duration);
+    transition-timing-function: ease;
   }
 }
