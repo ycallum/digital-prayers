@@ -38,14 +38,12 @@ export function SessionTimer() {
 
   return (
     <div className="flex flex-col items-center gap-4 mt-8 relative z-20">
-      {state.isSessionActive && (
-        <div className={`flex items-center justify-center gap-2 text-sm ${theme.text.secondary} ${theme.transition}`}>
-          <Timer className="w-4 h-4" />
-          <span>
-            {String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
-          </span>
-        </div>
-      )}
+      <div className={`flex items-center justify-center gap-2 text-sm ${theme.text.secondary} ${theme.transition}`}>
+        <Timer className="w-4 h-4" />
+        <span>
+          {String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
+        </span>
+      </div>
 
       <button
         onClick={handleReset}
