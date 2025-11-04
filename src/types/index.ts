@@ -1,6 +1,5 @@
 export type PresetType = 'full' | 'half' | 'short' | 'custom';
 export type BrightnessMode = 'normal' | 'dimmed';
-export type VisualizationMode = 'ring' | 'beads';
 export type ThemeType = 'default' | 'warm' | 'night';
 
 export interface AppState {
@@ -11,12 +10,13 @@ export interface AppState {
   isSessionActive: boolean;
   audioEnabled: boolean;
   audioVolume: number;
+  bgmEnabled: boolean;
+  bgmVolume: number;
   brightnessMode: BrightnessMode;
   selectedPreset: PresetType;
   customBeadCount: number;
   showSettings: boolean;
   isCompleting: boolean;
-  visualizationMode: VisualizationMode;
   theme: ThemeType;
 }
 
@@ -29,12 +29,13 @@ export type AppAction =
   | { type: 'SET_PRESET'; payload: PresetType }
   | { type: 'TOGGLE_AUDIO' }
   | { type: 'SET_VOLUME'; payload: number }
+  | { type: 'TOGGLE_BGM' }
+  | { type: 'SET_BGM_VOLUME'; payload: number }
   | { type: 'SET_BRIGHTNESS'; payload: BrightnessMode }
   | { type: 'START_SESSION' }
   | { type: 'END_SESSION' }
   | { type: 'COMPLETE_ROUND' }
   | { type: 'TOGGLE_SETTINGS' }
-  | { type: 'SET_VISUALIZATION_MODE'; payload: VisualizationMode }
   | { type: 'SET_THEME'; payload: ThemeType }
   | { type: 'LOAD_STATE'; payload: Partial<AppState> };
 

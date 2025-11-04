@@ -2,7 +2,7 @@ import { X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useApp } from '../context/AppContext';
 import { useState } from 'react';
-import type { VisualizationMode, ThemeType } from '../types';
+import type { ThemeType } from '../types';
 import { getThemeClasses } from '../lib/theme';
 
 export function SettingsDrawer() {
@@ -113,31 +113,6 @@ export function SettingsDrawer() {
                   <h3 className={`text-lg font-semibold ${theme.text.primary} mb-3 ${theme.transition}`}>外观设置</h3>
                   <div className="space-y-4">
                     <div>
-                      <label className={`text-sm ${theme.text.secondary} mb-2 block ${theme.transition}`}>可视化模式</label>
-                      <div className="space-y-2">
-                        {[
-                          { value: 'ring', label: '进度环' },
-                          { value: 'beads', label: '念珠弧' },
-                        ].map((mode) => (
-                          <label
-                            key={mode.value}
-                            className={`flex items-center gap-3 p-3 rounded-lg border ${theme.border} ${theme.button.hover} cursor-pointer ${theme.transition}`}
-                          >
-                            <input
-                              type="radio"
-                              name="visualizationMode"
-                              value={mode.value}
-                              checked={state.visualizationMode === mode.value}
-                              onChange={() => dispatch({ type: 'SET_VISUALIZATION_MODE', payload: mode.value as VisualizationMode })}
-                              className="w-4 h-4 accent-[var(--color-progress)] focus:ring-2 focus:ring-[var(--color-progress)]"
-                            />
-                            <span className={`${theme.text.primary} ${theme.transition}`}>{mode.label}</span>
-                          </label>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div>
                       <label className={`text-sm ${theme.text.secondary} mb-2 block ${theme.transition}`}>主题</label>
                       <div className="space-y-2">
                         {[
@@ -193,7 +168,7 @@ export function SettingsDrawer() {
                     {state.audioEnabled && (
                       <div>
                         <label className={`text-sm ${theme.text.secondary} mb-2 block ${theme.transition}`}>
-                          音量: {state.audioVolume}%
+                          音效音量: {state.audioVolume}%
                         </label>
                         <input
                           type="range"
@@ -203,6 +178,44 @@ export function SettingsDrawer() {
                           onChange={(e) =>
                             dispatch({
                               type: 'SET_VOLUME',
+                              payload: parseInt(e.target.value, 10),
+                            })
+                          }
+                          className="w-full accent-[var(--color-progress)]"
+                        />
+                      </div>
+                    )}
+
+                    <label className="flex items-center justify-between">
+                      <span className={`${theme.text.primary} ${theme.transition}`}>禅意背景音乐</span>
+                      <button
+                        onClick={() => dispatch({ type: 'TOGGLE_BGM' })}
+                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors`}
+                        style={{
+                          backgroundColor: state.bgmEnabled ? 'var(--color-progress)' : 'var(--color-text-secondary)',
+                        }}
+                      >
+                        <span
+                          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                            state.bgmEnabled ? 'translate-x-6' : 'translate-x-1'
+                          }`}
+                        />
+                      </button>
+                    </label>
+
+                    {state.bgmEnabled && (
+                      <div>
+                        <label className={`text-sm ${theme.text.secondary} mb-2 block ${theme.transition}`}>
+                          背景音乐音量: {state.bgmVolume}%
+                        </label>
+                        <input
+                          type="range"
+                          min="0"
+                          max="100"
+                          value={state.bgmVolume}
+                          onChange={(e) =>
+                            dispatch({
+                              type: 'SET_BGM_VOLUME',
                               payload: parseInt(e.target.value, 10),
                             })
                           }

@@ -1,6 +1,5 @@
 import { useRef, useState, useEffect, useCallback, memo } from 'react';
 import { ProgressRing } from './ProgressRing';
-import { BeadArc } from './BeadArc';
 import { CountDisplay } from './CountDisplay';
 import { CompletionEffect } from './CompletionEffect';
 import { useApp } from '../context/AppContext';
@@ -12,6 +11,7 @@ export const CountingArea = memo(function CountingArea() {
   const touchStartX = useRef(0);
   const touchStartY = useRef(0);
   const longPressTimer = useRef<number | null>(null);
+  const lastTouchTime = useRef(0);
   const [showInstruction, setShowInstruction] = useState(true);
 
   useEffect(() => {
@@ -76,6 +76,8 @@ export const CountingArea = memo(function CountingArea() {
       longPressTimer.current = null;
     }
 
+    lastTouchTime.current = Date.now();
+
     const touch = e.changedTouches[0];
     const deltaX = touch.clientX - touchStartX.current;
     const deltaY = touch.clientY - touchStartY.current;
@@ -91,19 +93,19 @@ export const CountingArea = memo(function CountingArea() {
     }
   }, [handleIncrement, handleDecrement]);
 
+  const handleClick = useCallback((e: React.MouseEvent) => {
+    // Prevent click if it was triggered by a touch event
+    if (Date.now() - lastTouchTime.current < 500) {
+      return;
+    }
+    handleIncrement();
+  }, [handleIncrement]);
+
   return (
     <div className="relative w-full">
-      {state.visualizationMode === 'beads' && (
-        <BeadArc
-          current={state.currentCount}
-          total={state.totalBeads}
-          isCompleting={state.isCompleting}
-        />
-      )}
-
       <div
         className="relative cursor-pointer touch-none select-none px-4 min-h-[280px] flex items-center justify-center"
-        onClick={handleIncrement}
+        onClick={handleClick}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
@@ -115,16 +117,14 @@ export const CountingArea = memo(function CountingArea() {
           touchAction: 'none'
         }}
       >
-        {state.visualizationMode === 'ring' && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <ProgressRing
-              current={state.currentCount}
-              total={state.totalBeads}
-              size={320}
-              isCompleting={state.isCompleting}
-            />
-          </div>
-        )}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <ProgressRing
+            current={state.currentCount}
+            total={state.totalBeads}
+            size={320}
+            isCompleting={state.isCompleting}
+          />
+        </div>
 
         <CountDisplay
           current={state.currentCount}

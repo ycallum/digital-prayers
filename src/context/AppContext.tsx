@@ -23,12 +23,13 @@ const initialState: AppState = {
   isSessionActive: false,
   audioEnabled: true,
   audioVolume: 70,
+  bgmEnabled: false,
+  bgmVolume: 30,
   brightnessMode: 'normal',
   selectedPreset: 'full',
   customBeadCount: 108,
   showSettings: false,
   isCompleting: false,
-  visualizationMode: 'ring',
   theme: 'default',
 };
 
@@ -107,6 +108,18 @@ function appReducer(state: AppState, action: AppAction): AppState {
         audioVolume: Math.max(0, Math.min(100, action.payload)),
       };
 
+    case 'TOGGLE_BGM':
+      return {
+        ...state,
+        bgmEnabled: !state.bgmEnabled,
+      };
+
+    case 'SET_BGM_VOLUME':
+      return {
+        ...state,
+        bgmVolume: Math.max(0, Math.min(100, action.payload)),
+      };
+
     case 'SET_BRIGHTNESS':
       return {
         ...state,
@@ -138,12 +151,6 @@ function appReducer(state: AppState, action: AppAction): AppState {
       return {
         ...state,
         showSettings: !state.showSettings,
-      };
-
-    case 'SET_VISUALIZATION_MODE':
-      return {
-        ...state,
-        visualizationMode: action.payload,
       };
 
     case 'SET_THEME':

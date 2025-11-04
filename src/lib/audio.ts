@@ -2,6 +2,9 @@ export class AudioManager {
   private context: AudioContext | null = null;
   private buffers: Map<string, AudioBuffer> = new Map();
   private gainNode: GainNode | null = null;
+  private bgmSource: AudioBufferSourceNode | null = null;
+  private bgmGainNode: GainNode | null = null;
+  private isBgmPlaying: boolean = false;
 
   async init(): Promise<void> {
     if (this.context) return;
@@ -11,8 +14,12 @@ export class AudioManager {
     this.gainNode = this.context.createGain();
     this.gainNode.connect(this.context.destination);
 
+    this.bgmGainNode = this.context.createGain();
+    this.bgmGainNode.connect(this.context.destination);
+
     await this.loadSound('click', '/sounds/bead-click.mp3');
     await this.loadSound('bell', '/sounds/completion-bell.mp3');
+    await this.loadSound('bgm', '/sounds/zen-bgm.mp3');
   }
 
   async loadSound(name: string, url: string): Promise<void> {
@@ -65,6 +72,44 @@ export class AudioManager {
     if (this.context && this.context.state === 'suspended') {
       this.context.resume();
     }
+  }
+
+  playBgm(volume: number = 0.3): void {
+    if (!this.context || !this.bgmGainNode || this.isBgmPlaying) return;
+
+    const buffer = this.buffers.get('bgm');
+    if (!buffer) {
+      console.warn('BGM not loaded');
+      return;
+    }
+
+    this.bgmSource = this.context.createBufferSource();
+    this.bgmSource.buffer = buffer;
+    this.bgmSource.loop = true;
+
+    this.bgmGainNode.gain.value = Math.max(0, Math.min(1, volume));
+    this.bgmSource.connect(this.bgmGainNode);
+
+    this.bgmSource.start(0);
+    this.isBgmPlaying = true;
+  }
+
+  pauseBgm(): void {
+    if (this.bgmSource && this.isBgmPlaying) {
+      this.bgmSource.stop();
+      this.bgmSource = null;
+      this.isBgmPlaying = false;
+    }
+  }
+
+  setBgmVolume(volume: number): void {
+    if (this.bgmGainNode) {
+      this.bgmGainNode.gain.value = Math.max(0, Math.min(1, volume));
+    }
+  }
+
+  isBgmActive(): boolean {
+    return this.isBgmPlaying;
   }
 }
 
