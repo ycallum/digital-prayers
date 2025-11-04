@@ -93,7 +93,7 @@ export const CountingArea = memo(function CountingArea() {
     }
   }, [handleIncrement, handleDecrement]);
 
-  const handleClick = useCallback((e: React.MouseEvent) => {
+  const handleClick = useCallback(() => {
     // Prevent click if it was triggered by a touch event
     if (Date.now() - lastTouchTime.current < 500) {
       return;
