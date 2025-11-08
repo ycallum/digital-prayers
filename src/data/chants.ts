@@ -24,7 +24,13 @@ export const chants: Chant[] = [
   }
 ]
 
-// Helper function for route loaders
+/**
+ * Retrieves a chant by its unique identifier
+ * Used by TanStack Router loaders for detail routes
+ *
+ * @param id - The unique chant identifier
+ * @returns The matching chant or undefined if not found
+ */
 export function getChantById(id: string): Chant | undefined {
   return chants.find(c => c.id === id)
 }
