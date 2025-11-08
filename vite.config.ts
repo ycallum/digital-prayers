@@ -2,6 +2,7 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import { VitePWA } from 'vite-plugin-pwa';
+import { TanStackRouterVite } from '@tanstack/router-vite-plugin';
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -15,6 +16,7 @@ export default defineConfig({
   cacheDir: '.vite', // Move cache out of node_modules
   plugins: [
     react(),
+    TanStackRouterVite(),
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
