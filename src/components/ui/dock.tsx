@@ -17,7 +17,7 @@ const Dock = ({ children, className }: DockProps) => {
     <motion.div
       className={cn(
         "mx-auto flex h-16 items-center gap-4 rounded-2xl px-4",
-        "bg-[var(--color-surface)] shadow-lg backdrop-blur-md",
+        "bg-[var(--color-button-background)] shadow-lg backdrop-blur-md",
         "fixed bottom-4 left-1/2 -translate-x-1/2 z-50",
         className
       )}
