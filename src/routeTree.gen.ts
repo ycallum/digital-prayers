@@ -10,11 +10,17 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as LibraryIndexRouteImport } from './routes/library/index'
+import { Route as CounterIndexRouteImport } from './routes/counter/index'
 import { Route as LibraryIdRouteImport } from './routes/library/$id'
 
 const LibraryIndexRoute = LibraryIndexRouteImport.update({
   id: '/library/',
   path: '/library/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CounterIndexRoute = CounterIndexRouteImport.update({
+  id: '/counter/',
+  path: '/counter/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LibraryIdRoute = LibraryIdRouteImport.update({
@@ -25,27 +31,31 @@ const LibraryIdRoute = LibraryIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/library/$id': typeof LibraryIdRoute
+  '/counter': typeof CounterIndexRoute
   '/library': typeof LibraryIndexRoute
 }
 export interface FileRoutesByTo {
   '/library/$id': typeof LibraryIdRoute
+  '/counter': typeof CounterIndexRoute
   '/library': typeof LibraryIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/library/$id': typeof LibraryIdRoute
+  '/counter/': typeof CounterIndexRoute
   '/library/': typeof LibraryIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/library/$id' | '/library'
+  fullPaths: '/library/$id' | '/counter' | '/library'
   fileRoutesByTo: FileRoutesByTo
-  to: '/library/$id' | '/library'
-  id: '__root__' | '/library/$id' | '/library/'
+  to: '/library/$id' | '/counter' | '/library'
+  id: '__root__' | '/library/$id' | '/counter/' | '/library/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   LibraryIdRoute: typeof LibraryIdRoute
+  CounterIndexRoute: typeof CounterIndexRoute
   LibraryIndexRoute: typeof LibraryIndexRoute
 }
 
@@ -56,6 +66,13 @@ declare module '@tanstack/react-router' {
       path: '/library'
       fullPath: '/library'
       preLoaderRoute: typeof LibraryIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/counter/': {
+      id: '/counter/'
+      path: '/counter'
+      fullPath: '/counter'
+      preLoaderRoute: typeof CounterIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/library/$id': {
@@ -70,6 +87,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   LibraryIdRoute: LibraryIdRoute,
+  CounterIndexRoute: CounterIndexRoute,
   LibraryIndexRoute: LibraryIndexRoute,
 }
 export const routeTree = rootRouteImport
