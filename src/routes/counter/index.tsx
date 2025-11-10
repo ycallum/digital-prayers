@@ -1,6 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useEffect } from 'react'
-import { Header } from '../../components/Header'
 import { CountingArea } from '../../components/CountingArea'
 import { SessionTimer } from '../../components/SessionTimer'
 import { SettingsDrawer } from '../../components/SettingsDrawer'
@@ -54,8 +53,7 @@ function CounterComponent() {
     >
       <BackgroundWords />
       <div className="relative z-10 flex flex-col h-full">
-        <Header />
-        <div className="flex-1 flex items-center justify-center pt-24 pb-24">
+        <div className="flex-1 flex items-center justify-center pb-24">
           <div className="flex flex-col items-center">
             <CountingArea />
             <SessionTimer />
