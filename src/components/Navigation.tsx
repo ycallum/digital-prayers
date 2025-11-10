@@ -1,9 +1,11 @@
 import { Link, useMatchRoute } from '@tanstack/react-router'
-import { BookOpen, Calculator } from 'lucide-react'
+import { BookOpen, Calculator, Settings } from 'lucide-react'
 import { Dock, DockIcon } from './ui/dock'
+import { useApp } from '../context/AppContext'
 
 export const Navigation = () => {
   const matchRoute = useMatchRoute()
+  const { dispatch } = useApp()
 
   // Type-safe route matching - no manual pathname checking
   const isLibrary = !!matchRoute({ to: '/library', fuzzy: true })
@@ -44,6 +46,19 @@ export const Navigation = () => {
           </div>
         </DockIcon>
       </Link>
+
+      <button onClick={() => dispatch({ type: 'TOGGLE_SETTINGS' })}>
+        <DockIcon
+          className="text-[var(--color-text-secondary)] hover:text-[var(--color-accent-primary)]"
+        >
+          <div
+            aria-label="设置"
+            className="w-full h-full flex items-center justify-center"
+          >
+            <Settings className="w-6 h-6" />
+          </div>
+        </DockIcon>
+      </button>
     </Dock>
   )
 }

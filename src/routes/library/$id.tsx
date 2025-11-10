@@ -32,7 +32,7 @@ function ChantDetailComponent() {
 
   return (
     <div
-      className={`min-h-screen ${themeClasses.background} ${themeClasses.transition} relative ${
+      className={`min-h-screen h-screen ${themeClasses.background} ${themeClasses.transition} relative overflow-y-auto ${
         state.brightnessMode === 'dimmed' ? 'brightness-75' : ''
       }`}
       style={{

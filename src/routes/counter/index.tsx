@@ -2,7 +2,6 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useEffect } from 'react'
 import { CountingArea } from '../../components/CountingArea'
 import { SessionTimer } from '../../components/SessionTimer'
-import { SettingsDrawer } from '../../components/SettingsDrawer'
 import { BackgroundWords } from '../../components/BackgroundWords'
 import { useApp } from '../../context/AppContext'
 import { audioManager } from '../../lib/audio'
@@ -59,7 +58,6 @@ function CounterComponent() {
             <SessionTimer />
           </div>
         </div>
-        <SettingsDrawer />
       </div>
     </div>
   )
