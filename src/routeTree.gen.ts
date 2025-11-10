@@ -9,10 +9,16 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as IndexRouteImport } from './routes/index'
 import { Route as LibraryIndexRouteImport } from './routes/library/index'
 import { Route as CounterIndexRouteImport } from './routes/counter/index'
 import { Route as LibraryIdRouteImport } from './routes/library/$id'
 
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LibraryIndexRoute = LibraryIndexRouteImport.update({
   id: '/library/',
   path: '/library/',
@@ -30,30 +36,34 @@ const LibraryIdRoute = LibraryIdRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
+  '/': typeof IndexRoute
   '/library/$id': typeof LibraryIdRoute
   '/counter': typeof CounterIndexRoute
   '/library': typeof LibraryIndexRoute
 }
 export interface FileRoutesByTo {
+  '/': typeof IndexRoute
   '/library/$id': typeof LibraryIdRoute
   '/counter': typeof CounterIndexRoute
   '/library': typeof LibraryIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
   '/library/$id': typeof LibraryIdRoute
   '/counter/': typeof CounterIndexRoute
   '/library/': typeof LibraryIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/library/$id' | '/counter' | '/library'
+  fullPaths: '/' | '/library/$id' | '/counter' | '/library'
   fileRoutesByTo: FileRoutesByTo
-  to: '/library/$id' | '/counter' | '/library'
-  id: '__root__' | '/library/$id' | '/counter/' | '/library/'
+  to: '/' | '/library/$id' | '/counter' | '/library'
+  id: '__root__' | '/' | '/library/$id' | '/counter/' | '/library/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
+  IndexRoute: typeof IndexRoute
   LibraryIdRoute: typeof LibraryIdRoute
   CounterIndexRoute: typeof CounterIndexRoute
   LibraryIndexRoute: typeof LibraryIndexRoute
@@ -61,6 +71,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/library/': {
       id: '/library/'
       path: '/library'
@@ -86,6 +103,7 @@ declare module '@tanstack/react-router' {
 }
 
 const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
   LibraryIdRoute: LibraryIdRoute,
   CounterIndexRoute: CounterIndexRoute,
   LibraryIndexRoute: LibraryIndexRoute,
