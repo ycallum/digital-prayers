@@ -18,7 +18,7 @@ export const Route = createFileRoute('/library/$id')({
     const themeClasses = getThemeClasses()
     return (
       <div className={`min-h-screen ${themeClasses.background} flex items-center justify-center`}>
-        <p className={themeClasses.textPrimary}>经文未找到</p>
+        <p className={themeClasses.text.primary}>经文未找到</p>
       </div>
     )
   },
@@ -46,11 +46,11 @@ function ChantDetailComponent() {
           <div className="px-4 py-4 flex items-center gap-4 max-w-2xl mx-auto">
             <button
               onClick={() => navigate({ to: '/library' })}
-              className={`${themeClasses.textAccent} hover:opacity-80 transition-opacity`}
+              className={`${themeClasses.accent.primary} hover:opacity-80 transition-opacity`}
             >
               <ArrowLeft className="w-6 h-6" />
             </button>
-            <h1 className={`text-lg font-semibold ${themeClasses.textPrimary} truncate`}>
+            <h1 className={`text-lg font-semibold ${themeClasses.text.primary} truncate`}>
               {chant.title}
             </h1>
           </div>
@@ -58,11 +58,11 @@ function ChantDetailComponent() {
 
         {/* Content */}
         <div className="px-6 py-8 max-w-2xl mx-auto">
-          <h2 className={`text-3xl font-bold ${themeClasses.textPrimary} text-center mb-8`}>
+          <h2 className={`text-3xl font-bold ${themeClasses.text.primary} text-center mb-8`}>
             {chant.title}
           </h2>
 
-          <div className={`${themeClasses.textPrimary} leading-loose text-lg whitespace-pre-wrap select-text`}>
+          <div className={`${themeClasses.text.primary} leading-loose text-lg whitespace-pre-wrap select-text`}>
             {chant.content}
           </div>
         </div>

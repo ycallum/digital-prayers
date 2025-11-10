@@ -30,7 +30,7 @@ function LibraryIndexComponent() {
     >
       <BackgroundWords />
       <div className="relative z-10 pb-24 px-4 pt-8 md:px-8 md:max-w-3xl md:mx-auto lg:max-w-4xl">
-        <h1 className={`text-3xl font-bold ${themeClasses.textPrimary} mb-8`}>经文库</h1>
+        <h1 className={`text-3xl font-bold ${themeClasses.text.primary} mb-8`}>经文库</h1>
 
       <div className="space-y-4">
         {chants.map((chant: Chant) => (
@@ -48,7 +48,7 @@ function LibraryIndexComponent() {
       </div>
 
         {chants.length === 1 && (
-          <p className={`text-center ${themeClasses.textSecondary} mt-8`}>
+          <p className={`text-center ${themeClasses.text.secondary} mt-8`}>
             更多经文即将到来
           </p>
         )}
