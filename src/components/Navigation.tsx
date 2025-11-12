@@ -1,18 +1,31 @@
-import { Link, useMatchRoute } from '@tanstack/react-router'
-import { BookOpen, Calculator, Settings } from 'lucide-react'
+import { Link, useMatchRoute, useNavigate } from '@tanstack/react-router'
+import { ArrowLeft, BookOpen, Calculator, Settings } from 'lucide-react'
 import { FloatingDock } from './ui/floating-dock'
 import { useApp } from '../context/AppContext'
 
 export const Navigation = () => {
   const matchRoute = useMatchRoute()
+  const navigate = useNavigate()
   const { dispatch } = useApp()
 
   // Type-safe route matching - no manual pathname checking
   const isLibrary = !!matchRoute({ to: '/library', fuzzy: true })
   const isCounter = !!matchRoute({ to: '/counter' })
+  const isLibraryDetail = !!matchRoute({ to: '/library/$id' })
 
   return (
     <FloatingDock>
+      {isLibraryDetail && (
+        <button onClick={() => navigate({ to: '/library' })}>
+          <div
+            aria-label="返回"
+            className="w-full h-full flex items-center justify-center rounded-full text-[var(--color-text-secondary)] hover:text-[var(--color-accent-primary)]"
+          >
+            <ArrowLeft className="w-6 h-6" />
+          </div>
+        </button>
+      )}
+
       <Link to="/counter">
         <div
           aria-label="计数器"
