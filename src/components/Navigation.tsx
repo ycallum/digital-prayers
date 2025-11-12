@@ -1,6 +1,6 @@
 import { Link, useMatchRoute } from '@tanstack/react-router'
 import { BookOpen, Calculator, Settings } from 'lucide-react'
-import { Dock, DockIcon } from './ui/dock'
+import { FloatingDock } from './ui/floating-dock'
 import { useApp } from '../context/AppContext'
 
 export const Navigation = () => {
@@ -12,53 +12,41 @@ export const Navigation = () => {
   const isCounter = !!matchRoute({ to: '/counter' })
 
   return (
-    <Dock>
+    <FloatingDock>
       <Link to="/counter">
-        <DockIcon
-          className={
+        <div
+          aria-label="计数器"
+          className={`w-full h-full flex items-center justify-center rounded-full ${
             isCounter
               ? 'bg-[var(--color-accent-primary)] text-white'
               : 'text-[var(--color-text-secondary)] hover:text-[var(--color-accent-primary)]'
-          }
+          }`}
         >
-          <div
-            aria-label="计数器"
-            className="w-full h-full flex items-center justify-center"
-          >
-            <Calculator className="w-6 h-6" />
-          </div>
-        </DockIcon>
+          <Calculator className="w-6 h-6" />
+        </div>
       </Link>
 
       <Link to="/library">
-        <DockIcon
-          className={
+        <div
+          aria-label="经文库"
+          className={`w-full h-full flex items-center justify-center rounded-full ${
             isLibrary
               ? 'bg-[var(--color-accent-primary)] text-white'
               : 'text-[var(--color-text-secondary)] hover:text-[var(--color-accent-primary)]'
-          }
+          }`}
         >
-          <div
-            aria-label="经文库"
-            className="w-full h-full flex items-center justify-center"
-          >
-            <BookOpen className="w-6 h-6" />
-          </div>
-        </DockIcon>
+          <BookOpen className="w-6 h-6" />
+        </div>
       </Link>
 
       <button onClick={() => dispatch({ type: 'TOGGLE_SETTINGS' })}>
-        <DockIcon
-          className="text-[var(--color-text-secondary)] hover:text-[var(--color-accent-primary)]"
+        <div
+          aria-label="设置"
+          className="w-full h-full flex items-center justify-center rounded-full text-[var(--color-text-secondary)] hover:text-[var(--color-accent-primary)]"
         >
-          <div
-            aria-label="设置"
-            className="w-full h-full flex items-center justify-center"
-          >
-            <Settings className="w-6 h-6" />
-          </div>
-        </DockIcon>
+          <Settings className="w-6 h-6" />
+        </div>
       </button>
-    </Dock>
+    </FloatingDock>
   )
 }
