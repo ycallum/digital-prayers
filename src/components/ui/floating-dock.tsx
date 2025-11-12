@@ -31,29 +31,31 @@ const FloatingDock = ({ children, className }: FloatingDockProps) => {
     return () => window.removeEventListener('resize', checkMobile)
   }, [])
 
+  // Filter out null/undefined children (e.g., conditional back button)
+  const childrenArray = Array.isArray(children)
+    ? children.filter(child => child != null)
+    : children ? [children] : []
+
   return (
     <motion.div
       onMouseMove={!isMobile ? (e) => mouseX.set(e.pageX) : undefined}
       onMouseLeave={!isMobile ? () => mouseX.set(Infinity) : undefined}
       className={cn(
-        "mx-auto flex items-center gap-2 rounded-2xl px-4 py-3",
-        // Better contrast with border and enhanced shadow
+        "mx-auto flex items-center gap-3 rounded-2xl px-3 py-2.5",
+        // Enhanced visual design
         "bg-[var(--color-button-background)] border-2 border-[var(--color-border)]",
-        "shadow-[0_8px_16px_rgba(0,0,0,0.12),0_2px_4px_rgba(0,0,0,0.08)]",
+        "shadow-[0_10px_20px_rgba(0,0,0,0.15),0_3px_6px_rgba(0,0,0,0.10)]",
         "backdrop-blur-md",
         // Position
         "fixed bottom-4 left-1/2 -translate-x-1/2 z-50",
-        // Mobile-friendly height
-        isMobile ? "h-auto" : "h-16",
+        // Smooth transitions
+        "transition-all duration-300",
         className
       )}
     >
-      {Array.isArray(children)
-        ? children.map((child, i) =>
-            <DockIcon key={i} mouseX={mouseX} isMobile={isMobile}>{child}</DockIcon>
-          )
-        : <DockIcon mouseX={mouseX} isMobile={isMobile}>{children}</DockIcon>
-      }
+      {childrenArray.map((child, i) =>
+        <DockIcon key={i} mouseX={mouseX} isMobile={isMobile}>{child}</DockIcon>
+      )}
     </motion.div>
   )
 }
@@ -68,28 +70,30 @@ const DockIcon = ({ mouseX, children, className, isMobile }: DockIconProps) => {
     return val - bounds.x - bounds.width / 2
   })
 
-  // Mobile: consistent 48px (touch-friendly), Desktop: 40-70px with magnification
+  // Mobile: consistent 48px (touch-friendly), Desktop: 44-64px with magnification
+  const size = isMobile ? 48 : 44
+  const maxSize = isMobile ? 48 : 64
+
   const widthSync = useTransform(
     distance,
     [-150, 0, 150],
-    isMobile ? [48, 48, 48] : [40, 70, 40]
+    [size, maxSize, size]
   )
   const width = useSpring(widthSync, { mass: 0.1, stiffness: 150, damping: 12 })
 
   const heightSync = useTransform(
     distance,
     [-150, 0, 150],
-    isMobile ? [48, 48, 48] : [40, 70, 40]
+    [size, maxSize, size]
   )
   const height = useSpring(heightSync, { mass: 0.1, stiffness: 150, damping: 12 })
 
   return (
     <motion.div
       ref={ref}
-      style={isMobile ? { width: 48, height: 48 } : { width, height }}
+      style={isMobile ? { width: size, height: size } : { width, height }}
       className={cn(
-        "flex items-center justify-center rounded-full",
-        "cursor-pointer active:scale-95 transition-transform duration-150",
+        "flex items-center justify-center rounded-full flex-shrink-0",
         className
       )}
     >
