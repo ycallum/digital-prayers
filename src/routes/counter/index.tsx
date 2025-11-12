@@ -32,7 +32,7 @@ function CounterComponent() {
     } else {
       audioManager.pauseBgm()
     }
-  }, [state.bgmEnabled])
+  }, [state.bgmEnabled, state.bgmVolume])
 
   // Handle BGM volume changes
   useEffect(() => {

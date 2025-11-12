@@ -27,7 +27,7 @@ export function AppEffects() {
     } else {
       audioManager.pauseBgm()
     }
-  }, [state.bgmEnabled])
+  }, [state.bgmEnabled, state.bgmVolume])
 
   // Control BGM volume
   useEffect(() => {

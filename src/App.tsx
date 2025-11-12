@@ -26,7 +26,7 @@ function AppContent() {
     } else {
       audioManager.pauseBgm();
     }
-  }, [state.bgmEnabled]);
+  }, [state.bgmEnabled, state.bgmVolume]);
 
   useEffect(() => {
     if (state.bgmEnabled) {
