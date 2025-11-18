@@ -38,12 +38,21 @@ const FloatingDock = ({ children, className }: FloatingDockProps) => {
 
   return (
     <motion.div
+      initial={{ y: 100, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{
+        type: "spring",
+        damping: 25,
+        stiffness: 200,
+        delay: 0.2
+      }}
       onMouseMove={!isMobile ? (e) => mouseX.set(e.pageX) : undefined}
       onMouseLeave={!isMobile ? () => mouseX.set(Infinity) : undefined}
       className={cn(
         "mx-auto flex items-center gap-3 rounded-2xl px-3 py-2.5",
-        // Enhanced visual design
-        "bg-[var(--color-button-background)] border-2 border-[var(--color-border)]",
+        // Zen aesthetic - clean and minimal
+        "bg-[var(--color-button-background)]",
+        "border border-[var(--color-border)]",
         "shadow-[0_10px_20px_rgba(0,0,0,0.15),0_3px_6px_rgba(0,0,0,0.10)]",
         "backdrop-blur-md",
         // Position

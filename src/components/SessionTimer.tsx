@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Timer, RotateCcw } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { getThemeClasses } from '../lib/theme';
+import { motion } from 'framer-motion';
 
 export function SessionTimer() {
   const { state, dispatch } = useApp();
@@ -37,23 +38,56 @@ export function SessionTimer() {
   const seconds = elapsed % 60;
 
   return (
-    <div className="flex flex-col items-center gap-4 mt-8 relative z-20">
-      <div className={`flex items-center justify-center gap-2 text-sm ${theme.text.secondary} ${theme.transition}`}>
-        <Timer className="w-4 h-4" />
-        <span>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, delay: 0.3 }}
+      className="flex flex-col items-center gap-6 mt-12 relative z-20"
+    >
+      {/* Zen timer display - clean and minimal */}
+      <div className={`
+        flex
+        items-center
+        justify-center
+        gap-3
+        px-6
+        py-3
+        ${theme.text.secondary}
+        ${theme.transition}
+      `}>
+        <Timer className="w-5 h-5" strokeWidth={2} />
+        <span className="text-2xl font-light tracking-wider">
           {String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
         </span>
       </div>
 
-      <button
+      {/* Zen reset button - subtle and elegant */}
+      <motion.button
         onClick={handleReset}
-        className={`px-5 py-2.5 rounded-lg ${theme.button.hover} ${theme.transition} disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2 ${theme.text.tertiary} text-sm pointer-events-auto`}
-        aria-label="Reset count and timer"
         disabled={state.currentCount === 0 && !state.isSessionActive}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        className={`
+          px-6
+          py-2.5
+          rounded-lg
+          ${theme.button.hover}
+          ${theme.transition}
+          disabled:opacity-40
+          disabled:cursor-not-allowed
+          flex
+          items-center
+          gap-2
+          ${theme.text.tertiary}
+          text-sm
+          font-light
+          tracking-wide
+        `}
+        aria-label="Reset count and timer"
       >
-        <RotateCcw className="w-4 h-4" />
+        <RotateCcw className="w-4 h-4" strokeWidth={2} />
         <span>重置</span>
-      </button>
-    </div>
+      </motion.button>
+    </motion.div>
   );
 }

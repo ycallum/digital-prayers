@@ -11,12 +11,12 @@ export const Navigation = () => {
   // Type-safe route matching - no manual pathname checking
   const isLibrary = !!matchRoute({ to: '/library', fuzzy: true })
   const isCounter = !!matchRoute({ to: '/counter' })
-  const isHome = isCounter // Counter is the home page
+  const isHome = !!matchRoute({ to: '/', fuzzy: false }) // Exact match for home
 
   return (
     <FloatingDock>
       <button
-        onClick={() => navigate({ to: '/counter' })}
+        onClick={() => navigate({ to: '/' })}
         aria-label="主页"
         className={`w-full h-full flex items-center justify-center rounded-full touch-manipulation transition-all duration-200 active:scale-90 ${
           isHome

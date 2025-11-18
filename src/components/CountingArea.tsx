@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect, useCallback, memo } from 'react';
+import { useRef, useEffect, useCallback, memo } from 'react';
 import { ProgressRing } from './ProgressRing';
 import { CountDisplay } from './CountDisplay';
 import { CompletionEffect } from './CompletionEffect';
@@ -12,13 +12,6 @@ export const CountingArea = memo(function CountingArea() {
   const touchStartY = useRef(0);
   const longPressTimer = useRef<number | null>(null);
   const lastTouchTime = useRef(0);
-  const [showInstruction, setShowInstruction] = useState(true);
-
-  useEffect(() => {
-    if (state.currentCount > 0) {
-      setShowInstruction(false);
-    }
-  }, [state.currentCount]);
 
   useEffect(() => {
     if (state.isCompleting) {
@@ -104,7 +97,7 @@ export const CountingArea = memo(function CountingArea() {
   return (
     <div className="relative w-full">
       <div
-        className="relative cursor-pointer touch-none select-none px-4 min-h-[280px] flex items-center justify-center"
+        className="relative cursor-pointer touch-none select-none px-4 min-h-[400px] flex items-center justify-center"
         onClick={handleClick}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
@@ -121,7 +114,7 @@ export const CountingArea = memo(function CountingArea() {
           <ProgressRing
             current={state.currentCount}
             total={state.totalBeads}
-            size={320}
+            size={380}
             isCompleting={state.isCompleting}
           />
         </div>
@@ -133,12 +126,6 @@ export const CountingArea = memo(function CountingArea() {
         />
         <CompletionEffect isVisible={state.isCompleting} />
       </div>
-
-      {showInstruction && state.currentCount === 0 && (
-        <div className="absolute -bottom-16 left-0 right-0 text-center pointer-events-none z-20">
-          <p className="text-xs opacity-40" style={{ color: 'var(--color-text-secondary)' }}>轻触屏幕开始计数</p>
-        </div>
-      )}
     </div>
   );
 });
