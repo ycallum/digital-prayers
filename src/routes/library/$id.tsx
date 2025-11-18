@@ -18,7 +18,7 @@ export const Route = createFileRoute('/library/$id')({
   notFoundComponent: () => {
     const themeClasses = getThemeClasses()
     return (
-      <div className={`min-h-screen ${themeClasses.background} flex items-center justify-center`}>
+      <div className={`min-h-screen-safe ${themeClasses.background} flex items-center justify-center`}>
         <p className={themeClasses.text.primary}>经文未找到</p>
       </div>
     )
@@ -35,12 +35,9 @@ function ChantDetailComponent() {
 
   return (
     <div
-      className={`min-h-screen h-screen ${themeClasses.background} ${themeClasses.transition} relative overflow-y-auto ${
+      className={`min-h-screen-safe h-screen ${themeClasses.background} ${themeClasses.transition} relative overflow-y-auto ${
         state.brightnessMode === 'dimmed' ? 'brightness-75' : ''
       }`}
-      style={{
-        minHeight: '-webkit-fill-available',
-      }}
     >
       <BackgroundWords />
 

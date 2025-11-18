@@ -25,7 +25,7 @@ export const LandingPage = () => {
   }))
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-theme flex items-center justify-center">
+    <div className="relative min-h-screen-safe overflow-hidden bg-theme flex items-center justify-center">
       {/* Falling leaves animation */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         {leaves.map((leaf) => (

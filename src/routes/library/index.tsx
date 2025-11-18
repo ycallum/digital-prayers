@@ -23,12 +23,9 @@ function LibraryIndexComponent() {
 
   return (
     <div
-      className={`min-h-screen h-screen ${themeClasses.background} ${themeClasses.transition} relative overflow-y-auto ${
+      className={`min-h-screen-safe h-screen ${themeClasses.background} ${themeClasses.transition} relative overflow-y-auto ${
         state.brightnessMode === 'dimmed' ? 'brightness-75' : ''
       }`}
-      style={{
-        minHeight: '-webkit-fill-available',
-      }}
     >
       <BackgroundWords />
 

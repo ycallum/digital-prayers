@@ -43,12 +43,9 @@ function CounterComponent() {
 
   return (
     <div
-      className={`min-h-screen h-screen ${themeClasses.background} ${themeClasses.transition} flex flex-col relative ${
+      className={`min-h-screen-safe h-screen ${themeClasses.background} ${themeClasses.transition} flex flex-col relative ${
         state.brightnessMode === 'dimmed' ? 'brightness-75' : ''
       }`}
-      style={{
-        minHeight: '-webkit-fill-available',
-      }}
     >
       <BackgroundWords />
       <div className="relative z-10 flex flex-col h-full">
