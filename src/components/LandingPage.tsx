@@ -2,7 +2,7 @@ import { motion } from 'framer-motion'
 import { useNavigate } from '@tanstack/react-router'
 
 // Leaf SVG component
-const Leaf = ({ delay = 0 }: { delay?: number }) => (
+const Leaf = () => (
   <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
     <path
       d="M10 2C10 2 6 6 6 10C6 12.2091 7.79086 14 10 14C12.2091 14 14 12.2091 14 10C14 6 10 2 10 2Z"
